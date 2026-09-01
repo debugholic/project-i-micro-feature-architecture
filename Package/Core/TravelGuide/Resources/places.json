@@ -1,0 +1,182 @@
+{
+  "cities": [
+    {
+      "names": ["Sapporo", "삿포로"],
+      "areas": [
+        {
+          "names": ["오도리·삿포로역", "오도리"],
+          "places": [
+            { "category": "sight", "name": "오도리 공원" },
+            { "category": "sight", "name": "삿포로 TV타워" },
+            { "category": "sight", "name": "삿포로 시계탑" },
+            { "category": "shopping", "name": "다이마루 백화점" },
+            { "category": "shopping", "name": "스텔라 플레이스" },
+            { "category": "food", "name": "니조 시장" }
+          ]
+        },
+        {
+          "names": ["스스키노"],
+          "places": [
+            { "category": "shopping", "name": "다누키코지 상점가" },
+            { "category": "shopping", "name": "돈키호테" },
+            { "category": "food", "name": "삿포로 라멘 요코초" },
+            { "category": "sight", "name": "노리아 관람차" }
+          ]
+        },
+        {
+          "names": ["마루야마·모이와"],
+          "places": [
+            { "category": "sight", "name": "모이와야마 전망대" },
+            { "category": "sight", "name": "홋카이도 신궁" },
+            { "category": "sight", "name": "마루야마 공원" }
+          ]
+        },
+        {
+          "names": ["시 외곽"],
+          "places": [
+            { "category": "sight", "name": "삿포로 맥주박물관" },
+            { "category": "sight", "name": "시로이코이비토 파크" },
+            { "category": "sight", "name": "삿포로 히츠지가오카 전망대" }
+          ]
+        }
+      ]
+    },
+    {
+      "names": ["Noboribetsu", "노보리베쓰"],
+      "areas": [
+        {
+          "names": ["노보리베쓰 온천"],
+          "places": [
+            { "category": "sight", "name": "지고쿠다니" },
+            { "category": "sight", "name": "오유누마" },
+            { "category": "sight", "name": "천연 족탕" },
+            { "category": "food", "name": "온천 시장" }
+          ]
+        },
+        {
+          "names": ["노보리베쓰 외곽"],
+          "places": [
+            { "category": "sight", "name": "노보리베쓰 구마목장" },
+            { "category": "sight", "name": "닌자 가스미 마을" }
+          ]
+        }
+      ]
+    },
+    {
+      "names": ["Tokyo", "도쿄"],
+      "areas": [
+        {
+          "names": ["신주쿠"],
+          "places": [
+            { "category": "sight", "name": "신주쿠 교엔" },
+            { "category": "sight", "name": "도쿄도청 전망대" },
+            { "category": "shopping", "name": "이세탄 신주쿠" },
+            { "category": "food", "name": "오모이데 요코초" }
+          ]
+        },
+        {
+          "names": ["시부야·하라주쿠"],
+          "places": [
+            { "category": "sight", "name": "시부야 스크램블 교차로" },
+            { "category": "sight", "name": "메이지 신궁" },
+            { "category": "shopping", "name": "다케시타 거리" },
+            { "category": "shopping", "name": "시부야 스카이" }
+          ]
+        },
+        {
+          "names": ["아사쿠사·우에노"],
+          "places": [
+            { "category": "sight", "name": "센소지" },
+            { "category": "sight", "name": "도쿄 스카이트리" },
+            { "category": "sight", "name": "우에노 공원" },
+            { "category": "food", "name": "아메요코 시장" }
+          ]
+        },
+        {
+          "names": ["긴자·츠키지"],
+          "places": [
+            { "category": "shopping", "name": "긴자 식스" },
+            { "category": "food", "name": "츠키지 장외시장" },
+            { "category": "sight", "name": "하마리큐 정원" }
+          ]
+        }
+      ]
+    },
+    {
+      "names": ["Osaka", "오사카"],
+      "areas": [
+        {
+          "names": ["난바·도톤보리"],
+          "places": [
+            { "category": "food", "name": "도톤보리" },
+            { "category": "food", "name": "구로몬 시장" },
+            { "category": "shopping", "name": "신사이바시스지" },
+            { "category": "sight", "name": "호젠지 요코초" }
+          ]
+        },
+        {
+          "names": ["우메다"],
+          "places": [
+            { "category": "sight", "name": "우메다 공중정원" },
+            { "category": "shopping", "name": "한큐 백화점" },
+            { "category": "food", "name": "우메다 지하상가" }
+          ]
+        },
+        {
+          "names": ["오사카성·덴노지"],
+          "places": [
+            { "category": "sight", "name": "오사카성" },
+            { "category": "sight", "name": "시텐노지" },
+            { "category": "sight", "name": "아베노 하루카스" }
+          ]
+        }
+      ]
+    },
+    {
+      "names": ["Seoul", "서울"],
+      "areas": [
+        {
+          "names": ["경복궁·북촌"],
+          "places": [
+            { "category": "sight", "name": "경복궁" },
+            { "category": "sight", "name": "북촌한옥마을" },
+            { "category": "sight", "name": "국립현대미술관 서울" },
+            { "category": "food", "name": "서촌 골목" }
+          ]
+        },
+        {
+          "names": ["홍대·연남"],
+          "places": [
+            { "category": "sight", "name": "경의선 숲길" },
+            { "category": "shopping", "name": "홍대 걷고싶은거리" },
+            { "category": "food", "name": "연남동 카페거리" }
+          ]
+        },
+        {
+          "names": ["성수"],
+          "places": [
+            { "category": "shopping", "name": "성수동 팝업거리" },
+            { "category": "food", "name": "성수 카페거리" },
+            { "category": "sight", "name": "서울숲" }
+          ]
+        },
+        {
+          "names": ["신사·가로수길"],
+          "places": [
+            { "category": "shopping", "name": "가로수길" },
+            { "category": "shopping", "name": "도산공원 편집숍" },
+            { "category": "food", "name": "압구정 로데오" }
+          ]
+        },
+        {
+          "names": ["명동·남산"],
+          "places": [
+            { "category": "shopping", "name": "명동 거리" },
+            { "category": "sight", "name": "남산서울타워" },
+            { "category": "food", "name": "광장시장" }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+import Foundation
+
+/// 도메인에 속하지 않는 날짜 픽스처. 각 모듈의 `*Fixtures` 가 공통으로 참조한다.
+public enum TestDate {
+  public static let date = Date(timeIntervalSince1970: 1_700_000_000)
+
+  public static func moment(
+    day: Int = 15,
+    hour: Int = 9,
+    minute: Int = 0
+  ) -> Date {
+    var components = DateComponents()
+    components.year = 2025
+    components.month = 7
+    components.day = day
+    components.hour = hour
+    components.minute = minute
+    return Calendar.current.date(from: components) ?? TestDate.date
+  }
+}
