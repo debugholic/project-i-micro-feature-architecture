@@ -18,7 +18,7 @@
 
 /* Begin PBXFileReference section */
 		0C8A7B213046AA8100F88288 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
-		0C8A7B693046B45C00F88288 /* ItineraryExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ItineraryExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C8A7B693046B45C00F88288 /* FeatureItineraryExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FeatureItineraryExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		57CE8C43432471E0BDF870DF /* AppComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppComponent.swift; sourceTree = "<group>"; };
 		3FB04FF9140AF70C19134582 /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -60,16 +60,16 @@
 			isa = PBXGroup;
 			children = (
 				0C8A7B233046AA8100F88288 /* Example */,
-				0C8A7B693046B45C00F88288 /* ItineraryExample.app */,
+				0C8A7B693046B45C00F88288 /* FeatureItineraryExample.app */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		231E3CB38C198BEE626AF1D1 /* ItineraryExample */ = {
+		231E3CB38C198BEE626AF1D1 /* FeatureItineraryExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A73F0750F379B1255381EEAD /* Build configuration list for PBXNativeTarget "ItineraryExample" */;
+			buildConfigurationList = A73F0750F379B1255381EEAD /* Build configuration list for PBXNativeTarget "FeatureItineraryExample" */;
 			buildPhases = (
 				D05902015FDEFBBC7EB217A5 /* Sources */,
 				7F163C4DB56DDF129E4F3FBF /* Frameworks */,
@@ -79,15 +79,15 @@
 			);
 			dependencies = (
 			);
-			name = ItineraryExample;
+			name = FeatureItineraryExample;
 			packageProductDependencies = (
 				1BAE12B9B0B917D37259F383 /* CoreKit */,
 				410F64796FD044559FD1ACA5 /* Itinerary */,
 				CDEFB708035205DB5AE7F9EF /* Recommendation */,
 				BED57E4E5A4C56A62C84AB3D /* Trip */,
 			);
-			productName = ItineraryExample;
-			productReference = 0C8A7B693046B45C00F88288 /* ItineraryExample.app */;
+			productName = FeatureItineraryExample;
+			productReference = 0C8A7B693046B45C00F88288 /* FeatureItineraryExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -122,7 +122,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				231E3CB38C198BEE626AF1D1 /* ItineraryExample */,
+				231E3CB38C198BEE626AF1D1 /* FeatureItineraryExample */,
 			);
 		};
 /* End PBXProject section */
@@ -158,7 +158,7 @@
 				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = ItineraryExample;
+				PRODUCT_NAME = FeatureItineraryExample;
 			};
 			name = Debug;
 		};
@@ -355,7 +355,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		A73F0750F379B1255381EEAD /* Build configuration list for PBXNativeTarget "ItineraryExample" */ = {
+		A73F0750F379B1255381EEAD /* Build configuration list for PBXNativeTarget "FeatureItineraryExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7778C8D8CD720A9F276A0296 /* Debug */,

@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "96E13169840D4222A7012D17"
-               BuildableName = "ReservationExample.app"
-               BlueprintName = "ReservationExample"
-               ReferencedContainer = "container:FeatureReservation.xcodeproj">
+               BlueprintIdentifier = "231E3CB38C198BEE626AF1D1"
+               BuildableName = "FeatureItineraryExample.app"
+               BlueprintName = "FeatureItineraryExample"
+               ReferencedContainer = "container:FeatureItinerary.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,9 +32,19 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FeatureReservationTests"
-               BuildableName = "FeatureReservationTests"
-               BlueprintName = "FeatureReservationTests"
+               BlueprintIdentifier = "DomainItineraryTests"
+               BuildableName = "DomainItineraryTests"
+               BlueprintName = "DomainItineraryTests"
+               ReferencedContainer = "container:../../../Modules">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FeatureItineraryTests"
+               BuildableName = "FeatureItineraryTests"
+               BlueprintName = "FeatureItineraryTests"
                ReferencedContainer = "container:../../../Modules">
             </BuildableReference>
          </TestableReference>
@@ -54,10 +64,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "96E13169840D4222A7012D17"
-            BuildableName = "ReservationExample.app"
-            BlueprintName = "ReservationExample"
-            ReferencedContainer = "container:FeatureReservation.xcodeproj">
+            BlueprintIdentifier = "231E3CB38C198BEE626AF1D1"
+            BuildableName = "FeatureItineraryExample.app"
+            BlueprintName = "FeatureItineraryExample"
+            ReferencedContainer = "container:FeatureItinerary.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -71,10 +81,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "96E13169840D4222A7012D17"
-            BuildableName = "ReservationExample.app"
-            BlueprintName = "ReservationExample"
-            ReferencedContainer = "container:FeatureReservation.xcodeproj">
+            BlueprintIdentifier = "231E3CB38C198BEE626AF1D1"
+            BuildableName = "FeatureItineraryExample.app"
+            BlueprintName = "FeatureItineraryExample"
+            ReferencedContainer = "container:FeatureItinerary.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

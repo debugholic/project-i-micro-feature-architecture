@@ -17,7 +17,7 @@
 
 /* Begin PBXFileReference section */
 		0C8A7B0C3046AA4400F88288 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
-		0C8A7B6A3046B46100F88288 /* ReservationExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReservationExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0C8A7B6A3046B46100F88288 /* FeatureReservationExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FeatureReservationExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF4BE5B87EE211B2B5861636 /* AppComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppComponent.swift; sourceTree = "<group>"; };
 		D3F1A193C2B549CC5E05AC80 /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,16 +58,16 @@
 			isa = PBXGroup;
 			children = (
 				0C8A7B0E3046AA4400F88288 /* Example */,
-				0C8A7B6A3046B46100F88288 /* ReservationExample.app */,
+				0C8A7B6A3046B46100F88288 /* FeatureReservationExample.app */,
 			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		96E13169840D4222A7012D17 /* ReservationExample */ = {
+		96E13169840D4222A7012D17 /* FeatureReservationExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 41B545CB8BBA633167A841EF /* Build configuration list for PBXNativeTarget "ReservationExample" */;
+			buildConfigurationList = 41B545CB8BBA633167A841EF /* Build configuration list for PBXNativeTarget "FeatureReservationExample" */;
 			buildPhases = (
 				10DE031EC11B1559B6C0B335 /* Sources */,
 				0A1D4544668C4BDF932326EF /* Frameworks */,
@@ -77,14 +77,14 @@
 			);
 			dependencies = (
 			);
-			name = ReservationExample;
+			name = FeatureReservationExample;
 			packageProductDependencies = (
 				12455B26B59F333A4FC7EEF0 /* CoreKit */,
 				397F7757A735F8AE18ECEB46 /* Reservation */,
 				DAE1FBD9B5E9303BCA5589D5 /* Trip */,
 			);
-			productName = ReservationExample;
-			productReference = 0C8A7B6A3046B46100F88288 /* ReservationExample.app */;
+			productName = FeatureReservationExample;
+			productReference = 0C8A7B6A3046B46100F88288 /* FeatureReservationExample.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -119,7 +119,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				96E13169840D4222A7012D17 /* ReservationExample */,
+				96E13169840D4222A7012D17 /* FeatureReservationExample */,
 			);
 		};
 /* End PBXProject section */
@@ -333,7 +333,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		41B545CB8BBA633167A841EF /* Build configuration list for PBXNativeTarget "ReservationExample" */ = {
+		41B545CB8BBA633167A841EF /* Build configuration list for PBXNativeTarget "FeatureReservationExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				6B84C609822E95BFE96612B7 /* Debug */,

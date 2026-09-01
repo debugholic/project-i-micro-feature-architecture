@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "FD92707A7F93AE2012BA0CA4"
-               BuildableName = "TripExample.app"
-               BlueprintName = "TripExample"
+               BuildableName = "FeatureTripExample.app"
+               BlueprintName = "FeatureTripExample"
                ReferencedContainer = "container:FeatureTrip.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -65,8 +65,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FD92707A7F93AE2012BA0CA4"
-            BuildableName = "TripExample.app"
-            BlueprintName = "TripExample"
+            BuildableName = "FeatureTripExample.app"
+            BlueprintName = "FeatureTripExample"
             ReferencedContainer = "container:FeatureTrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -82,8 +82,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "FD92707A7F93AE2012BA0CA4"
-            BuildableName = "TripExample.app"
-            BlueprintName = "TripExample"
+            BuildableName = "FeatureTripExample.app"
+            BlueprintName = "FeatureTripExample"
             ReferencedContainer = "container:FeatureTrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
