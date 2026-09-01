@@ -1,7 +1,6 @@
 import Combine
 import DomainItineraryInterface
 import DomainRecommendationInterface
-import DomainReservationInterface
 import DomainTripInterface
 import Foundation
 import SharedCommon
@@ -11,10 +10,11 @@ protocol ItineraryViewModelInput: ViewModelInput {
   func didDismissRecommendations()
   func didSelectDate(_ date: Date)
   func didSelectItem(_ item: ItineraryItem)
+  func didSelectLodging()
+  func didSelectPlace(_ place: TripPlace)
   func didTapAddSight()
   func didTapCreateSight()
   func didTapHour(_ hour: Int)
-  func didTapLodging()
   func didTapMeal(_ slot: MealSlot)
 }
 
@@ -42,22 +42,34 @@ final class ItineraryViewModel: ViewModel, ObservableObject, ItineraryViewModelO
 
   private let calendar: Calendar
   private let deleteItineraryItemUseCase: any DeleteItineraryItemUseCase
+  private let deleteLodgingUseCase: any DeleteLodgingUseCase
+  private let deleteTripPlaceUseCase: any DeleteTripPlaceUseCase
   private let recommendAreasUseCase: any RecommendAreasUseCase
   private let saveItineraryItemUseCase: any SaveItineraryItemUseCase
+  private let saveLodgingUseCase: any SaveLodgingUseCase
+  private let saveTripPlaceUseCase: any SaveTripPlaceUseCase
   private var cancellables = Set<AnyCancellable>()
 
   init(
     calendar: Calendar = .current,
     deleteItineraryItemUseCase: any DeleteItineraryItemUseCase,
+    deleteLodgingUseCase: any DeleteLodgingUseCase,
+    deleteTripPlaceUseCase: any DeleteTripPlaceUseCase,
     observeDayPlansUseCase: any ObserveDayPlansUseCase,
     recommendAreasUseCase: any RecommendAreasUseCase,
     saveItineraryItemUseCase: any SaveItineraryItemUseCase,
+    saveLodgingUseCase: any SaveLodgingUseCase,
+    saveTripPlaceUseCase: any SaveTripPlaceUseCase,
     trip: Trip
   ) {
     self.calendar = calendar
     self.deleteItineraryItemUseCase = deleteItineraryItemUseCase
+    self.deleteLodgingUseCase = deleteLodgingUseCase
+    self.deleteTripPlaceUseCase = deleteTripPlaceUseCase
     self.recommendAreasUseCase = recommendAreasUseCase
     self.saveItineraryItemUseCase = saveItineraryItemUseCase
+    self.saveLodgingUseCase = saveLodgingUseCase
+    self.saveTripPlaceUseCase = saveTripPlaceUseCase
     self.trip = trip
 
     Task { [weak self] in
@@ -84,9 +96,13 @@ final class ItineraryViewModel: ViewModel, ObservableObject, ItineraryViewModelO
     calendar.component(.hour, from: item.startTime)
   }
 
-  private func defaultLocation(for category: ItineraryCategory) -> String {
-    guard category == .lodging, let destination = selectedPlan?.destination else { return "" }
-    return ItineraryFormatter.placeName(destination)
+  private var defaultLodgingLocation: String {
+    selectedPlan.map { ItineraryFormatter.placeName($0.destination) } ?? ""
+  }
+
+  private var unscheduledPlaces: [TripPlace] {
+    guard let selectedPlan else { return [] }
+    return selectedPlan.places.filter { selectedPlan.item(for: $0) == nil }
   }
 
   private func defaultCheckOut(after startTime: Date) -> Date {
@@ -112,38 +128,44 @@ final class ItineraryViewModel: ViewModel, ObservableObject, ItineraryViewModelO
     }
   }
 
-  private var unscheduledSights: [ItineraryItem] {
-    (selectedPlan?.sights ?? []).filter { $0.category == .sight }
-  }
-
   private func openEditor(
-    category: ItineraryCategory,
+    target: ItineraryEditorTarget,
     editingItem: ItineraryItem? = nil,
+    editingLodging: Lodging? = nil,
+    editingPlace: TripPlace? = nil,
     hour: Int
   ) {
     guard let selectedDate,
           let startTime = editingItem?.startTime
+            ?? editingLodging?.checkIn
             ?? calendar.date(bySettingHour: hour, minute: 0, second: 0, of: selectedDate)
     else { return }
 
-    let endTime = editingItem?.endTime ?? defaultCheckOut(after: startTime)
+    let isCreating = editingItem == nil && editingLodging == nil && editingPlace == nil
 
     editorViewModel = ItineraryEditorViewModel(
       actions: ItineraryEditorViewModelActions(
         didFinish: { [weak self] in self?.editorViewModel = nil }
       ),
       calendar: calendar,
-      category: category,
+      date: selectedDate,
       deleteItineraryItemUseCase: deleteItineraryItemUseCase,
-      editingItemID: editingItem?.id,
-      endTime: endTime,
-      location: editingItem?.location ?? defaultLocation(for: category),
+      deleteLodgingUseCase: deleteLodgingUseCase,
+      deleteTripPlaceUseCase: deleteTripPlaceUseCase,
+      editingItem: editingItem,
+      editingLodging: editingLodging,
+      editingPlace: editingPlace,
+      endTime: editingLodging?.checkOut ?? defaultCheckOut(after: startTime),
+      location: editingLodging?.location ?? (target == .lodging ? defaultLodgingLocation : ""),
       occupiedHours: occupiedHours(excluding: editingItem),
       saveItineraryItemUseCase: saveItineraryItemUseCase,
+      saveLodgingUseCase: saveLodgingUseCase,
+      saveTripPlaceUseCase: saveTripPlaceUseCase,
       startTime: startTime,
-      title: editingItem?.title ?? "",
+      target: target,
+      title: editingItem?.title ?? editingLodging?.name ?? editingPlace?.name ?? "",
       tripID: trip.id,
-      unscheduledSights: editingItem == nil ? unscheduledSights : []
+      unscheduledPlaces: isCreating ? unscheduledPlaces : []
     )
   }
 }
@@ -159,6 +181,34 @@ extension ItineraryViewModel: ItineraryViewModelInput {
     recommendationViewModel = nil
   }
 
+  func didSelectDate(_ date: Date) {
+    selectedDate = date
+  }
+
+  func didSelectItem(_ item: ItineraryItem) {
+    openEditor(
+      target: .item(mealSlot: item.mealSlot),
+      editingItem: item,
+      hour: calendar.component(.hour, from: item.startTime)
+    )
+  }
+
+  func didSelectLodging() {
+    openEditor(
+      target: .lodging,
+      editingLodging: selectedPlan?.lodging,
+      hour: ItineraryDefaultHour.checkIn
+    )
+  }
+
+  func didSelectPlace(_ place: TripPlace) {
+    guard let item = selectedPlan?.item(for: place) else {
+      openEditor(target: .place, editingPlace: place, hour: ItineraryDefaultHour.sight)
+      return
+    }
+    didSelectItem(item)
+  }
+
   func didTapAddSight() {
     guard let selectedDate, let destination = selectedPlan?.destination else { return }
 
@@ -168,47 +218,26 @@ extension ItineraryViewModel: ItineraryViewModelInput {
       ),
       city: ItineraryFormatter.placeName(destination),
       date: selectedDate,
-      deleteItineraryItemUseCase: deleteItineraryItemUseCase,
+      deleteTripPlaceUseCase: deleteTripPlaceUseCase,
+      places: selectedPlan?.places ?? [],
       recommendAreasUseCase: recommendAreasUseCase,
-      saveItineraryItemUseCase: saveItineraryItemUseCase,
-      sights: unscheduledSights,
+      saveTripPlaceUseCase: saveTripPlaceUseCase,
       tripID: trip.id
     )
   }
 
-  /// 추천 목록을 거치지 않고 이름만 적어 관광지를 담는다.
   func didTapCreateSight() {
-    openEditor(category: .sight, hour: ItineraryDefaultHour.sight)
-  }
-
-  func didSelectDate(_ date: Date) {
-    selectedDate = date
-  }
-
-  func didSelectItem(_ item: ItineraryItem) {
-    openEditor(
-      category: item.category,
-      editingItem: item,
-      hour: calendar.component(.hour, from: item.startTime)
-    )
+    openEditor(target: .place, hour: ItineraryDefaultHour.sight)
   }
 
   func didTapHour(_ hour: Int) {
     guard !occupiedHours(excluding: nil).contains(hour) else { return }
-    openEditor(category: .place, hour: hour)
-  }
-
-  func didTapLodging() {
-    openEditor(
-      category: .lodging,
-      editingItem: selectedPlan?.lodging,
-      hour: ItineraryDefaultHour.checkIn
-    )
+    openEditor(target: .item(mealSlot: nil), hour: hour)
   }
 
   func didTapMeal(_ slot: MealSlot) {
     openEditor(
-      category: .meal(slot),
+      target: .item(mealSlot: slot),
       editingItem: selectedPlan?.meal(slot),
       hour: 0
     )

@@ -8,12 +8,12 @@ public struct SaveItineraryItemUseCaseImpl: SaveItineraryItemUseCase {
   ) {
     self.itineraryRepository = itineraryRepository
   }
-  
+
   public func execute(
-    request: ItineraryItem
+    request item: ItineraryItem
   ) {
     itineraryRepository.save(
-      request
+      item
     )
   }
 }

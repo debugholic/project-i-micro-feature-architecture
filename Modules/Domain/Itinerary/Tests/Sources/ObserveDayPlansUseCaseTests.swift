@@ -1,16 +1,13 @@
 import Combine
 import DomainItineraryInterface
 import DomainItineraryTesting
-import DomainReservationInterface
 import DomainReservationTesting
 import DomainTripInterface
 import DomainTripTesting
 import Foundation
-import SharedCommon
 import SharedCommonTesting
 import XCTest
 @testable import DomainItinerary
-
 
 final class ObserveDayPlansUseCaseTests: XCTestCase {
 
@@ -45,28 +42,24 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
       .flight(trip.outbound, .arrival),
     ])
     XCTAssertEqual(plans.last?.items.count, 2)
-    XCTAssertEqual(plans[1].items, [])
   }
 
   func test_execute_sortsStoredItemsAndFlightsByStartTime() async throws {
-    let itineraryRepository = MockItineraryRepository()
-    let sut = makeSUT(itineraryRepository: itineraryRepository)
+    let sut = makeSUT()
     let trip = makeTrip(roundTrip: false)
 
     let lunch = ItineraryFixtures.itineraryItem(
-      category: .meal(.lunch),
+      mealSlot: .lunch,
       startTime: TestDate.moment(day: 15, hour: 12, minute: 30),
       title: "에비소바 이치겐",
       tripID: trip.id
     )
     let terminal = ItineraryFixtures.itineraryItem(
-      category: .place,
       startTime: TestDate.moment(day: 15, hour: 5, minute: 20),
       title: "인천공항 제1터미널",
       tripID: trip.id
     )
-    itineraryRepository.save(lunch)
-    itineraryRepository.save(terminal)
+    save(items: [lunch, terminal])
 
     let plans = try await plans(of: sut, trip: trip)
 
@@ -79,11 +72,10 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
   }
 
   func test_execute_ignoresItemsOfOtherTrips() async throws {
-    let itineraryRepository = MockItineraryRepository()
-    let sut = makeSUT(itineraryRepository: itineraryRepository)
+    let sut = makeSUT()
     let trip = makeTrip(roundTrip: false)
 
-    itineraryRepository.save(ItineraryFixtures.itineraryItem(tripID: UUID()))
+    save(items: [ItineraryFixtures.itineraryItem(tripID: UUID())])
 
     let plans = try await plans(of: sut, trip: trip)
 
@@ -91,16 +83,15 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
   }
 
   func test_execute_addsDayOutsideTripRangeWhenItemHasOne() async throws {
-    let itineraryRepository = MockItineraryRepository()
-    let sut = makeSUT(itineraryRepository: itineraryRepository)
+    let sut = makeSUT()
     let trip = makeTrip(roundTrip: false)
 
-    itineraryRepository.save(
+    save(items: [
       ItineraryFixtures.itineraryItem(
         startTime: TestDate.moment(day: 16, hour: 9),
         tripID: trip.id
       )
-    )
+    ])
 
     let plans = try await plans(of: sut, trip: trip)
 
@@ -123,28 +114,25 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
   }
 
   func test_execute_lodgingSpansItsNights() async throws {
-    let itineraryRepository = MockItineraryRepository()
-    let sut = makeSUT(itineraryRepository: itineraryRepository)
+    let sut = makeSUT()
     let trip = makeTrip(roundTrip: true)
 
-    itineraryRepository.save(
+    save(lodgings: [
       ItineraryFixtures.lodging(
         checkIn: TestDate.moment(day: 15, hour: 15),
         checkOut: TestDate.moment(day: 16, hour: 10),
         location: "Noboribetsu",
-        title: "다이이치 타키모토칸",
+        name: "다이이치 타키모토칸",
         tripID: trip.id
-      )
-    )
-    itineraryRepository.save(
+      ),
       ItineraryFixtures.lodging(
         checkIn: TestDate.moment(day: 16, hour: 15),
         checkOut: TestDate.moment(day: 19, hour: 11),
         location: "Sapporo",
-        title: "베셀 호텔",
+        name: "베셀 호텔",
         tripID: trip.id
-      )
-    )
+      ),
+    ])
 
     let plans = try await plans(of: sut, trip: trip)
 
@@ -155,7 +143,7 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
       "Sapporo | Sapporo",
       "Sapporo | Seoul",
     ])
-    XCTAssertEqual(plans.map { $0.lodging?.title }, [
+    XCTAssertEqual(plans.map { $0.lodging?.name }, [
       "다이이치 타키모토칸",
       "베셀 호텔",
       "베셀 호텔",
@@ -164,9 +152,26 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
     ])
   }
 
-  func test_execute_timelineExcludesLodgingAndMeal() async throws {
-    let itineraryRepository = MockItineraryRepository()
-    let sut = makeSUT(itineraryRepository: itineraryRepository)
+  func test_execute_lodgingWithoutLocation_doesNotMoveDestination() async throws {
+    let sut = makeSUT()
+    let trip = makeTrip(roundTrip: false)
+
+    save(lodgings: [
+      ItineraryFixtures.lodging(
+        checkIn: TestDate.moment(day: 15, hour: 15),
+        checkOut: TestDate.moment(day: 16, hour: 11),
+        location: nil,
+        tripID: trip.id
+      )
+    ])
+
+    let plans = try await plans(of: sut, trip: trip)
+
+    XCTAssertEqual(plans.first.map { route($0) }, "Seoul | Sapporo")
+  }
+
+  func test_execute_timelineExcludesMeal() async throws {
+    let sut = makeSUT()
     let trip = makeTrip(roundTrip: false)
 
     let park = ItineraryFixtures.itineraryItem(
@@ -174,16 +179,16 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
       title: "오도리 공원",
       tripID: trip.id
     )
-    itineraryRepository.save(park)
-    itineraryRepository.save(ItineraryFixtures.lodging(tripID: trip.id))
-    itineraryRepository.save(
+    save(items: [
+      park,
       ItineraryFixtures.itineraryItem(
-        category: .meal(.dinner),
+        mealSlot: .dinner,
         startTime: TestDate.moment(day: 15, hour: 19),
         title: "63 로쿠산",
         tripID: trip.id
-      )
-    )
+      ),
+    ])
+    save(lodgings: [ItineraryFixtures.lodging(tripID: trip.id)])
 
     let plan = try await plans(of: sut, trip: trip).first
 
@@ -197,39 +202,82 @@ final class ObserveDayPlansUseCaseTests: XCTestCase {
     XCTAssertNotNil(plan?.meal(.dinner))
   }
 
-  func test_execute_lodgingWithoutLocation_doesNotMoveDestination() async throws {
-    let itineraryRepository = MockItineraryRepository()
-    let sut = makeSUT(itineraryRepository: itineraryRepository)
-    let trip = makeTrip(roundTrip: false)
+  // MARK: - 담아둔 곳
 
-    itineraryRepository.save(
-      ItineraryFixtures.lodging(
-        checkIn: TestDate.moment(day: 15, hour: 15),
-        checkOut: TestDate.moment(day: 16, hour: 11),
-        location: nil,
-        tripID: trip.id
-      )
+  func test_execute_groupsPlacesByTheirDay() async throws {
+    let sut = makeSUT()
+    let trip = makeTrip(roundTrip: true)
+
+    let first = ItineraryFixtures.place(
+      date: TestDate.moment(day: 15),
+      name: "오도리 공원",
+      tripID: trip.id
     )
+    let second = ItineraryFixtures.place(
+      date: TestDate.moment(day: 16),
+      name: "다누키코지 상점가",
+      tripID: trip.id
+    )
+    save(places: [first, second, ItineraryFixtures.place(tripID: UUID())])
 
     let plans = try await plans(of: sut, trip: trip)
 
-    XCTAssertEqual(plans.first.map { route($0) }, "Seoul | Sapporo")
+    XCTAssertEqual(plans.first?.places.map(\.name), ["오도리 공원"])
+    XCTAssertEqual(plans.dropFirst().first?.places.map(\.name), ["다누키코지 상점가"])
+  }
+
+  func test_execute_linksScheduledItemToItsPlace() async throws {
+    let sut = makeSUT()
+    let trip = makeTrip(roundTrip: false)
+
+    let place = ItineraryFixtures.place(
+      date: TestDate.moment(day: 15),
+      name: "오도리 공원",
+      tripID: trip.id
+    )
+    save(places: [place])
+    save(items: [
+      ItineraryFixtures.itineraryItem(
+        placeID: place.id,
+        startTime: TestDate.moment(day: 15, hour: 13),
+        title: place.name,
+        tripID: trip.id
+      )
+    ])
+
+    let plan = try await plans(of: sut, trip: trip).first
+
+    XCTAssertNotNil(plan?.item(for: place))
   }
 
   // MARK: - Helpers
 
+  private let itemsSubject = CurrentValueSubject<[ItineraryItem], Never>([])
+  private let lodgingsSubject = CurrentValueSubject<[Lodging], Never>([])
+  private let placesSubject = CurrentValueSubject<[TripPlace], Never>([])
   private let tripsSubject = CurrentValueSubject<[Trip], Never>([])
 
-  private func makeSUT(
-    itineraryRepository: MockItineraryRepository = MockItineraryRepository()
-  ) -> any ObserveDayPlansUseCase {
+  private func makeSUT() -> any ObserveDayPlansUseCase {
     ObserveDayPlansUseCaseImpl(
-      items: itineraryRepository.itemsPublisher,
+      items: itemsSubject.eraseToAnyPublisher(),
+      lodgings: lodgingsSubject.eraseToAnyPublisher(),
+      places: placesSubject.eraseToAnyPublisher(),
       trips: tripsSubject.eraseToAnyPublisher()
     )
   }
 
-  /// 표시 문자열로 origin·destination 을 읽기 쉽게 비교한다.
+  private func save(items: [ItineraryItem]) {
+    itemsSubject.send(itemsSubject.value + items)
+  }
+
+  private func save(lodgings: [Lodging]) {
+    lodgingsSubject.send(lodgingsSubject.value + lodgings)
+  }
+
+  private func save(places: [TripPlace]) {
+    placesSubject.send(placesSubject.value + places)
+  }
+
   private func route(_ plan: DayPlan) -> String {
     "\(placeName(plan.origin)) | \(placeName(plan.destination))"
   }

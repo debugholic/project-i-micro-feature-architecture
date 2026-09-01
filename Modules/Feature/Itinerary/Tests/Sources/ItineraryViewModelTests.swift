@@ -62,7 +62,7 @@ final class ItineraryViewModelTests: XCTestCase {
 
     sut.didTapHour(14)
 
-    XCTAssertEqual(sut.editorViewModel?.category, .place)
+    XCTAssertEqual(sut.editorViewModel?.target, .item(mealSlot: nil))
     let startTime = sut.editorViewModel?.startTime
     XCTAssertEqual(calendar.component(.hour, from: startTime ?? .distantPast), 14)
     XCTAssertEqual(calendar.component(.minute, from: startTime ?? .distantPast), 0)
@@ -76,23 +76,21 @@ final class ItineraryViewModelTests: XCTestCase {
 
     sut.didTapMeal(.dinner)
 
-    XCTAssertEqual(sut.editorViewModel?.category, .meal(.dinner))
-    XCTAssertEqual(sut.editorViewModel?.showsTime, false)
+    XCTAssertEqual(sut.editorViewModel?.target, .item(mealSlot: .dinner))
     XCTAssertEqual(
       calendar.startOfDay(for: sut.editorViewModel?.startTime ?? .distantPast),
       plans[0].date
     )
   }
 
-  func test_didTapLodging_opensEditorWithDefaultRange() {
+  func test_didSelectLodging_opensEditorWithDefaultRange() {
     let plans = makePlans()
     let sut = makeSUT(plans: plans)
     waitForPlans(sut, count: plans.count)
 
-    sut.didTapLodging()
+    sut.didSelectLodging()
 
-    XCTAssertEqual(sut.editorViewModel?.category, .lodging)
-    XCTAssertEqual(sut.editorViewModel?.showsLodgingRange, true)
+    XCTAssertEqual(sut.editorViewModel?.target, .lodging)
     XCTAssertEqual(
       calendar.component(.hour, from: sut.editorViewModel?.startTime ?? .distantPast),
       ItineraryDefaultHour.checkIn
@@ -111,7 +109,7 @@ final class ItineraryViewModelTests: XCTestCase {
     )
   }
 
-  func test_didTapLodging_prefillsLocationWithDaysDestination() {
+  func test_didSelectLodging_prefillsLocationWithDaysDestination() {
     let plan = ItineraryFixtures.dayPlan(
       date: calendar.startOfDay(for: TestDate.moment(day: 15)),
       destination: .airport(ReservationFixtures.airport(city: "Sapporo", code: "CTS", country: "Japan"))
@@ -119,14 +117,14 @@ final class ItineraryViewModelTests: XCTestCase {
     let sut = makeSUT(plans: [plan])
     waitForPlans(sut, count: 1)
 
-    sut.didTapLodging()
+    sut.didSelectLodging()
 
     XCTAssertEqual(sut.editorViewModel?.location, "Sapporo")
   }
 
-  func test_didTapLodging_whenLodgingExists_opensEditorForIt() {
+  func test_didSelectLodging_whenLodgingExists_opensEditorForIt() {
     let tripID = UUID()
-    let lodging = ItineraryFixtures.lodging(title: "다이이치 타키모토칸", tripID: tripID)
+    let lodging = ItineraryFixtures.lodging(name: "다이이치 타키모토칸", tripID: tripID)
     let plan = ItineraryFixtures.dayPlan(
       date: calendar.startOfDay(for: TestDate.moment(day: 15)),
       lodging: lodging
@@ -134,11 +132,11 @@ final class ItineraryViewModelTests: XCTestCase {
     let sut = makeSUT(plans: [plan])
     waitForPlans(sut, count: 1)
 
-    sut.didTapLodging()
+    sut.didSelectLodging()
 
     XCTAssertEqual(sut.editorViewModel?.title, "다이이치 타키모토칸")
     XCTAssertEqual(sut.editorViewModel?.location, "Sapporo")
-    XCTAssertEqual(sut.editorViewModel?.endTime, lodging.endTime)
+    XCTAssertEqual(sut.editorViewModel?.endTime, lodging.checkOut)
     XCTAssertEqual(sut.editorViewModel?.isEditing, true)
   }
 
@@ -178,7 +176,7 @@ final class ItineraryViewModelTests: XCTestCase {
   func test_didTapMeal_whenMealExists_opensEditorForIt() {
     let tripID = UUID()
     let dinner = ItineraryFixtures.itineraryItem(
-      category: .meal(.dinner),
+      mealSlot: .dinner,
       startTime: TestDate.moment(day: 15, hour: 19),
       title: "63 로쿠산",
       tripID: tripID
@@ -247,57 +245,83 @@ final class ItineraryViewModelTests: XCTestCase {
     XCTAssertEqual(sut.recommendationViewModel?.city, "삿포로")
   }
 
-  func test_didTapHour_offersUnscheduledSightsAsChips() {
+  func test_didTapHour_offersUnscheduledPlacesAsChips() {
     let tripID = UUID()
-    let sight = ItineraryFixtures.itineraryItem(category: .sight, title: "오도리 공원", tripID: tripID)
-    let scheduled = ItineraryFixtures.itineraryItem(
-      startTime: TestDate.moment(day: 15, hour: 13),
-      title: "삿포로 TV타워",
-      tripID: tripID
-    )
+    let unscheduled = ItineraryFixtures.place(name: "오도리 공원", tripID: tripID)
+    let already = ItineraryFixtures.place(name: "삿포로 TV타워", tripID: tripID)
     let plan = ItineraryFixtures.dayPlan(
       date: calendar.startOfDay(for: TestDate.moment(day: 15)),
-      items: [.custom(sight), .custom(scheduled)]
+      items: [
+        .custom(
+          ItineraryFixtures.itineraryItem(
+            placeID: already.id,
+            startTime: TestDate.moment(day: 15, hour: 13),
+            title: already.name,
+            tripID: tripID
+          )
+        )
+      ],
+      places: [unscheduled, already]
     )
     let sut = makeSUT(plans: [plan])
     waitForPlans(sut, count: 1)
 
     sut.didTapHour(10)
 
-    XCTAssertEqual(sut.editorViewModel?.unscheduledSights.map(\.title), ["오도리 공원"])
+    XCTAssertEqual(sut.editorViewModel?.unscheduledPlaces.map(\.name), ["오도리 공원"])
   }
 
-  func test_didSelectItem_sightOpensWithoutTime() {
+  func test_didTapCreateSight_opensPlaceEditor() {
+    let plans = makePlans()
+    let sut = makeSUT(plans: plans)
+    waitForPlans(sut, count: plans.count)
+
+    sut.didTapCreateSight()
+
+    XCTAssertEqual(sut.editorViewModel?.target, .place)
+    XCTAssertEqual(sut.editorViewModel?.isEditing, false)
+  }
+
+  func test_didSelectPlace_opensPlaceEditorForIt() {
     let tripID = UUID()
-    let sight = ItineraryFixtures.itineraryItem(category: .sight, title: "오도리 공원", tripID: tripID)
+    let place = ItineraryFixtures.place(name: "오도리 공원", tripID: tripID)
     let plan = ItineraryFixtures.dayPlan(
       date: calendar.startOfDay(for: TestDate.moment(day: 15)),
-      items: [.custom(sight)]
+      places: [place]
     )
     let sut = makeSUT(plans: [plan])
     waitForPlans(sut, count: 1)
 
-    sut.didSelectItem(sight)
+    sut.didSelectPlace(place)
 
-    XCTAssertEqual(sut.editorViewModel?.showsTime, false)
-    XCTAssertEqual(sut.editorViewModel?.category, .sight)
+    XCTAssertEqual(sut.editorViewModel?.title, "오도리 공원")
+
+    XCTAssertEqual(sut.editorViewModel?.target, .place)
   }
 
   // MARK: - Helpers
 
   private func makeSUT(
     deleteItineraryItemUseCase: MockDeleteItineraryItemUseCase = MockDeleteItineraryItemUseCase(),
+    deleteLodgingUseCase: MockDeleteLodgingUseCase = MockDeleteLodgingUseCase(),
+    deleteTripPlaceUseCase: MockDeleteTripPlaceUseCase = MockDeleteTripPlaceUseCase(),
     observeDayPlansUseCase: MockObserveDayPlansUseCase = MockObserveDayPlansUseCase(),
     plans: [DayPlan] = [],
     recommendAreasUseCase: MockRecommendAreasUseCase = MockRecommendAreasUseCase(),
-    saveItineraryItemUseCase: MockSaveItineraryItemUseCase = MockSaveItineraryItemUseCase()
+    saveItineraryItemUseCase: MockSaveItineraryItemUseCase = MockSaveItineraryItemUseCase(),
+    saveLodgingUseCase: MockSaveLodgingUseCase = MockSaveLodgingUseCase(),
+    saveTripPlaceUseCase: MockSaveTripPlaceUseCase = MockSaveTripPlaceUseCase()
   ) -> ItineraryViewModel {
     if !plans.isEmpty { observeDayPlansUseCase.emit(plans) }
     return ItineraryViewModel(
       deleteItineraryItemUseCase: deleteItineraryItemUseCase,
+      deleteLodgingUseCase: deleteLodgingUseCase,
+      deleteTripPlaceUseCase: deleteTripPlaceUseCase,
       observeDayPlansUseCase: observeDayPlansUseCase,
       recommendAreasUseCase: recommendAreasUseCase,
       saveItineraryItemUseCase: saveItineraryItemUseCase,
+      saveLodgingUseCase: saveLodgingUseCase,
+      saveTripPlaceUseCase: saveTripPlaceUseCase,
       trip: TripFixtures.trip()
     )
   }

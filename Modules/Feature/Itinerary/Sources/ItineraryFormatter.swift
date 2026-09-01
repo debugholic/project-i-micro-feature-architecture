@@ -36,15 +36,6 @@ nonisolated enum ItineraryFormatter {
     return formatter.string(from: date)
   }
 
-  static func categoryName(_ category: ItineraryCategory) -> String {
-    switch category {
-    case .lodging: return "숙소"
-    case let .meal(slot): return mealName(slot)
-    case .place: return "장소"
-    case .sight: return "관광지"
-    }
-  }
-
   static func dayTime(_ date: Date) -> String {
     let formatter = DateFormatter()
     formatter.locale = Locale(identifier: "ko_KR")
@@ -68,12 +59,8 @@ nonisolated enum ItineraryFormatter {
     }
   }
 
-  static func symbol(_ category: ItineraryCategory) -> String {
-    switch category {
-    case .lodging: return "bed.double.fill"
-    case .meal: return "fork.knife"
-    case .place, .sight: return "mappin.and.ellipse"
-    }
+  static func symbol(_ item: ItineraryItem) -> String {
+    item.mealSlot == nil ? "mappin.and.ellipse" : "fork.knife"
   }
 
   static func title(_ item: DayPlanItem) -> String {

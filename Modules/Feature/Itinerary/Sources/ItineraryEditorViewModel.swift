@@ -1,8 +1,4 @@
-import Combine
 import DomainItineraryInterface
-import DomainRecommendationInterface
-import DomainReservationInterface
-import DomainTripInterface
 import Foundation
 import SharedCommon
 
@@ -10,8 +6,14 @@ struct ItineraryEditorViewModelActions: ViewModelActions {
   let didFinish: () -> Void
 }
 
+enum ItineraryEditorTarget: Hashable {
+  case item(mealSlot: MealSlot?)
+  case lodging
+  case place
+}
+
 protocol ItineraryEditorViewModelInput: ViewModelInput {
-  func didSelectSight(_ sight: ItineraryItem)
+  func didSelectPlace(_ place: TripPlace)
   func didTapCancel()
   func didTapDelete()
   func didTapSave()
@@ -21,18 +23,18 @@ protocol ItineraryEditorViewModelInput: ViewModelInput {
 protocol ItineraryEditorViewModelOutput: ViewModelOutput {
   var canSave: Bool { get }
   var canUnschedule: Bool { get }
-  var category: ItineraryCategory { get }
   var endTime: Date { get set }
   var isEditing: Bool { get }
   var isHourAvailable: Bool { get }
   var isRangeValid: Bool { get }
   var location: String { get set }
-  var showsLodgingRange: Bool { get }
-  var showsTime: Bool { get }
   var startTime: Date { get set }
+  var target: ItineraryEditorTarget { get }
   var title: String { get set }
-  var unscheduledSights: [ItineraryItem] { get }
+  var unscheduledPlaces: [TripPlace] { get }
 }
+
+typealias ItineraryEditorViewModelType = ItineraryEditorViewModelInput & ItineraryEditorViewModelOutput
 
 final class ItineraryEditorViewModel: ViewModel, ObservableObject, ItineraryEditorViewModelOutput, Identifiable {
   @Published var endTime: Date
@@ -40,89 +42,101 @@ final class ItineraryEditorViewModel: ViewModel, ObservableObject, ItineraryEdit
   @Published var startTime: Date
   @Published var title: String
 
-  @Published private(set) var category: ItineraryCategory
-  @Published private(set) var pickedSight: ItineraryItem?
-
-  private let editingItemID: UUID?
+  @Published private(set) var pickedPlace: TripPlace?
 
   let actions: ItineraryEditorViewModelActions?
   let id = UUID()
-  let unscheduledSights: [ItineraryItem]
+  let target: ItineraryEditorTarget
+  let unscheduledPlaces: [TripPlace]
 
   private let calendar: Calendar
+  private let date: Date
   private let deleteItineraryItemUseCase: any DeleteItineraryItemUseCase
+  private let deleteLodgingUseCase: any DeleteLodgingUseCase
+  private let deleteTripPlaceUseCase: any DeleteTripPlaceUseCase
+  private let editingItem: ItineraryItem?
+  private let editingLodging: Lodging?
+  private let editingPlace: TripPlace?
   private let occupiedHours: Set<Int>
   private let saveItineraryItemUseCase: any SaveItineraryItemUseCase
+  private let saveLodgingUseCase: any SaveLodgingUseCase
+  private let saveTripPlaceUseCase: any SaveTripPlaceUseCase
   private let tripID: UUID
 
   init(
     actions: ItineraryEditorViewModelActions,
     calendar: Calendar = .current,
-    category: ItineraryCategory,
+    date: Date,
     deleteItineraryItemUseCase: any DeleteItineraryItemUseCase,
-    editingItemID: UUID? = nil,
+    deleteLodgingUseCase: any DeleteLodgingUseCase,
+    deleteTripPlaceUseCase: any DeleteTripPlaceUseCase,
+    editingItem: ItineraryItem? = nil,
+    editingLodging: Lodging? = nil,
+    editingPlace: TripPlace? = nil,
     endTime: Date,
     location: String = "",
     occupiedHours: Set<Int> = [],
     saveItineraryItemUseCase: any SaveItineraryItemUseCase,
+    saveLodgingUseCase: any SaveLodgingUseCase,
+    saveTripPlaceUseCase: any SaveTripPlaceUseCase,
     startTime: Date,
+    target: ItineraryEditorTarget,
     title: String = "",
     tripID: UUID,
-    unscheduledSights: [ItineraryItem] = []
+    unscheduledPlaces: [TripPlace] = []
   ) {
     self.actions = actions
     self.calendar = calendar
-    self.category = category
+    self.date = date
     self.deleteItineraryItemUseCase = deleteItineraryItemUseCase
-    self.editingItemID = editingItemID
+    self.deleteLodgingUseCase = deleteLodgingUseCase
+    self.deleteTripPlaceUseCase = deleteTripPlaceUseCase
+    self.editingItem = editingItem
+    self.editingLodging = editingLodging
+    self.editingPlace = editingPlace
     self.endTime = endTime
     self.location = location
     self.occupiedHours = occupiedHours
     self.saveItineraryItemUseCase = saveItineraryItemUseCase
+    self.saveLodgingUseCase = saveLodgingUseCase
+    self.saveTripPlaceUseCase = saveTripPlaceUseCase
     self.startTime = startTime
+    self.target = target
     self.title = title
     self.tripID = tripID
-    self.unscheduledSights = unscheduledSights
+    self.unscheduledPlaces = unscheduledPlaces
   }
 
   var canSave: Bool {
     !trimmedTitle.isEmpty && isHourAvailable && isRangeValid
   }
 
-  /// 시각이 붙은 장소만 시간표에서 뺄 수 있다.
   var canUnschedule: Bool {
-    isEditing && category == .place
+    editingItem?.placeID != nil
   }
 
   var isEditing: Bool {
-    editingItemID != nil
-  }
-
-  /// 칩을 골라 이름이 그대로면 그 항목에 시각을 주는 것이고,
-  /// 이름을 고쳤으면 새 항목이다.
-  private var itemID: UUID {
-    if let editingItemID { return editingItemID }
-    if let pickedSight, pickedSight.title == trimmedTitle { return pickedSight.id }
-    return UUID()
+    editingItem != nil || editingLodging != nil || editingPlace != nil
   }
 
   var isHourAvailable: Bool {
-    guard category == .place else { return true }
+    guard case .item(nil) = target else { return true }
     return !occupiedHours.contains(calendar.component(.hour, from: startTime))
   }
 
   var isRangeValid: Bool {
-    guard showsLodgingRange else { return true }
+    guard target == .lodging else { return true }
     return startTime < endTime
   }
 
-  var showsLodgingRange: Bool {
-    category == .lodging
+  private var mealSlot: MealSlot? {
+    guard case let .item(slot) = target else { return nil }
+    return slot
   }
 
-  /// 시각을 고르는 건 장소뿐이다. 식사는 누른 시간대를, 숙소는 체크인·아웃을 쓴다.
-  var showsTime: Bool {
-    category == .place
+  private var pickedPlaceID: UUID? {
+    guard let pickedPlace, pickedPlace.name == trimmedTitle else { return nil }
+    return pickedPlace.id
   }
 
   private var trimmedLocation: String {
@@ -135,12 +149,32 @@ final class ItineraryEditorViewModel: ViewModel, ObservableObject, ItineraryEdit
 
   private func makeItem() -> ItineraryItem {
     ItineraryItem(
-      category: category,
-      endTime: showsLodgingRange ? endTime : nil,
-      id: itemID,
-      location: showsLodgingRange && !trimmedLocation.isEmpty ? trimmedLocation : nil,
+      id: editingItem?.id ?? UUID(),
+      mealSlot: mealSlot,
+      placeID: editingItem?.placeID ?? pickedPlaceID,
       startTime: startTime,
       title: trimmedTitle,
+      tripID: tripID
+    )
+  }
+
+  private func makeLodging() -> Lodging {
+    Lodging(
+      checkIn: startTime,
+      checkOut: endTime,
+      id: editingLodging?.id ?? UUID(),
+      location: trimmedLocation.isEmpty ? nil : trimmedLocation,
+      name: trimmedTitle,
+      tripID: tripID
+    )
+  }
+
+  private func makePlace() -> TripPlace {
+    TripPlace(
+      category: editingPlace?.category,
+      date: date,
+      id: editingPlace?.id ?? UUID(),
+      name: trimmedTitle,
       tripID: tripID
     )
   }
@@ -149,9 +183,11 @@ final class ItineraryEditorViewModel: ViewModel, ObservableObject, ItineraryEdit
 // MARK: - Input
 
 extension ItineraryEditorViewModel: ItineraryEditorViewModelInput {
-  func didSelectSight(_ sight: ItineraryItem) {
-    pickedSight = sight
-    title = sight.title
+  func didSelectPlace(
+    _ place: TripPlace
+  ) {
+    pickedPlace = place
+    title = place.name
   }
 
   func didTapCancel() {
@@ -160,30 +196,61 @@ extension ItineraryEditorViewModel: ItineraryEditorViewModelInput {
 
   func didTapDelete() {
     guard isEditing else { return }
-    let item = makeItem()
 
-    Task { [deleteItineraryItemUseCase] in
-      try? await deleteItineraryItemUseCase.execute(request: item)
+    switch target {
+    case .item:
+      guard let editingItem else { return }
+      finish { [deleteItineraryItemUseCase] in
+        try await deleteItineraryItemUseCase.execute(request: editingItem)
+      }
+    case .lodging:
+      guard let editingLodging else { return }
+      finish { [deleteLodgingUseCase] in
+        try await deleteLodgingUseCase.execute(request: editingLodging)
+      }
+    case .place:
+      guard let editingPlace else { return }
+      finish { [deleteTripPlaceUseCase] in
+        try await deleteTripPlaceUseCase.execute(request: editingPlace)
+      }
     }
-    actions?.didFinish()
   }
 
   func didTapSave() {
     guard canSave else { return }
-    save(makeItem())
+
+    switch target {
+    case .item:
+      let item = makeItem()
+      finish { [saveItineraryItemUseCase] in
+        try await saveItineraryItemUseCase.execute(request: item)
+      }
+    case .lodging:
+      let lodging = makeLodging()
+      finish { [saveLodgingUseCase] in
+        try await saveLodgingUseCase.execute(request: lodging)
+      }
+    case .place:
+      let place = makePlace()
+      finish { [saveTripPlaceUseCase] in
+        try await saveTripPlaceUseCase.execute(request: place)
+      }
+    }
   }
 
   func didTapUnschedule() {
-    guard canUnschedule else { return }
-    category = .sight
-    save(makeItem())
+    guard canUnschedule, let editingItem else { return }
+
+    finish { [deleteItineraryItemUseCase] in
+      try await deleteItineraryItemUseCase.execute(request: editingItem)
+    }
   }
 
-  private func save(
-    _ item: ItineraryItem
+  private func finish(
+    _ work: @escaping () async throws -> Void
   ) {
-    Task { [saveItineraryItemUseCase] in
-      try? await saveItineraryItemUseCase.execute(request: item)
+    Task {
+      try? await work()
     }
     actions?.didFinish()
   }

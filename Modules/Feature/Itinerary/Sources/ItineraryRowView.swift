@@ -66,7 +66,7 @@ struct ItineraryRowView: View {
 
     private var symbol: String {
       switch item {
-      case let .custom(item): return ItineraryFormatter.symbol(item.category)
+      case let .custom(item): return ItineraryFormatter.symbol(item)
       case .flight: return "airplane"
       }
     }
@@ -75,11 +75,7 @@ struct ItineraryRowView: View {
       switch item {
       case .flight: return .blue
       case let .custom(item):
-        switch item.category {
-        case .lodging: return .purple
-        case .meal: return .orange
-        case .place, .sight: return .green
-        }
+        return item.mealSlot == nil ? .green : .orange
       }
     }
   }

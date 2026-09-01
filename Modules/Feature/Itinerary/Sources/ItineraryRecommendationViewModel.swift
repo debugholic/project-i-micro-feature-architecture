@@ -32,29 +32,29 @@ final class ItineraryRecommendationViewModel: ViewModel, ObservableObject, Itine
   let id = UUID()
 
   private let date: Date
-  private let deleteItineraryItemUseCase: any DeleteItineraryItemUseCase
-  private let saveItineraryItemUseCase: any SaveItineraryItemUseCase
+  private let deleteTripPlaceUseCase: any DeleteTripPlaceUseCase
+  private let saveTripPlaceUseCase: any SaveTripPlaceUseCase
   private let tripID: UUID
-  private var picked: [String: ItineraryItem]
+  private var picked: [String: TripPlace]
 
   init(
     actions: ItineraryRecommendationViewModelActions,
     city: String,
     date: Date,
-    deleteItineraryItemUseCase: any DeleteItineraryItemUseCase,
+    deleteTripPlaceUseCase: any DeleteTripPlaceUseCase,
+    places: [TripPlace],
     recommendAreasUseCase: any RecommendAreasUseCase,
-    saveItineraryItemUseCase: any SaveItineraryItemUseCase,
-    sights: [ItineraryItem],
+    saveTripPlaceUseCase: any SaveTripPlaceUseCase,
     tripID: UUID
   ) {
     self.actions = actions
     self.city = city
     self.date = date
-    self.deleteItineraryItemUseCase = deleteItineraryItemUseCase
-    self.saveItineraryItemUseCase = saveItineraryItemUseCase
+    self.deleteTripPlaceUseCase = deleteTripPlaceUseCase
+    self.saveTripPlaceUseCase = saveTripPlaceUseCase
     self.tripID = tripID
-    self.picked = Dictionary(sights.map { ($0.title, $0) }, uniquingKeysWith: { first, _ in first })
-    self.pickedNames = Set(sights.map(\.title))
+    self.picked = Dictionary(places.map { ($0.name, $0) }, uniquingKeysWith: { first, _ in first })
+    self.pickedNames = Set(places.map(\.name))
 
     Task { [weak self] in
       let loaded = (try? await recommendAreasUseCase.execute(request: city)) ?? []
@@ -82,22 +82,22 @@ extension ItineraryRecommendationViewModel: ItineraryRecommendationViewModelInpu
     if let existing = picked[place.name] {
       picked[place.name] = nil
       pickedNames.remove(place.name)
-      Task { [deleteItineraryItemUseCase] in
-        try? await deleteItineraryItemUseCase.execute(request: existing)
+      Task { [deleteTripPlaceUseCase] in
+        try? await deleteTripPlaceUseCase.execute(request: existing)
       }
       return
     }
 
-    let item = ItineraryItem(
-      category: .sight,
-      startTime: date,
-      title: place.name,
+    let picking = TripPlace(
+      category: place.category,
+      date: date,
+      name: place.name,
       tripID: tripID
     )
-    picked[place.name] = item
+    picked[place.name] = picking
     pickedNames.insert(place.name)
-    Task { [saveItineraryItemUseCase] in
-      try? await saveItineraryItemUseCase.execute(request: item)
+    Task { [saveTripPlaceUseCase] in
+      try? await saveTripPlaceUseCase.execute(request: picking)
     }
   }
 }

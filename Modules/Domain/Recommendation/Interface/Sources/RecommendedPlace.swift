@@ -24,7 +24,7 @@ public nonisolated struct RecommendedPlace: Hashable {
   }
 }
 
-public nonisolated enum PlaceCategory: Hashable, CaseIterable {
+public nonisolated enum PlaceCategory: Codable, Hashable, CaseIterable {
   case food
   case shopping
   case sight

@@ -7,14 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C8A7B0F3046AA4400F88288 /* ReservationExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A7B0C3046AA4400F88288 /* ReservationExampleApp.swift */; };
+		0C8A7B0F3046AA4400F88288 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A7B0C3046AA4400F88288 /* ExampleApp.swift */; };
 		226D6EC109C8C5A7DC9FFE5D /* Trip in Frameworks */ = {isa = PBXBuildFile; productRef = DAE1FBD9B5E9303BCA5589D5 /* Trip */; };
 		479BDF6AC4E662D1DDFA3C24 /* Reservation in Frameworks */ = {isa = PBXBuildFile; productRef = 397F7757A735F8AE18ECEB46 /* Reservation */; };
+		9E0514B23CF033D67484261D /* CoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 12455B26B59F333A4FC7EEF0 /* CoreKit */; };
+		2E88865B8FD445D6AD44A4A5 /* AppComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF4BE5B87EE211B2B5861636 /* AppComponent.swift */; };
+		52F31883935973AFC09C0D68 /* AppFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F1A193C2B549CC5E05AC80 /* AppFlowCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0C8A7B0C3046AA4400F88288 /* ReservationExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReservationExampleApp.swift; sourceTree = "<group>"; };
+		0C8A7B0C3046AA4400F88288 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
 		0C8A7B6A3046B46100F88288 /* ReservationExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ReservationExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF4BE5B87EE211B2B5861636 /* AppComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppComponent.swift; sourceTree = "<group>"; };
+		D3F1A193C2B549CC5E05AC80 /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -22,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9E0514B23CF033D67484261D /* CoreKit in Frameworks */,
 				479BDF6AC4E662D1DDFA3C24 /* Reservation in Frameworks */,
 				226D6EC109C8C5A7DC9FFE5D /* Trip in Frameworks */,
 			);
@@ -33,7 +39,9 @@
 		0C8A7B0D3046AA4400F88288 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				0C8A7B0C3046AA4400F88288 /* ReservationExampleApp.swift */,
+				D3F1A193C2B549CC5E05AC80 /* AppFlowCoordinator.swift */,
+				FF4BE5B87EE211B2B5861636 /* AppComponent.swift */,
+				0C8A7B0C3046AA4400F88288 /* ExampleApp.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -71,6 +79,7 @@
 			);
 			name = ReservationExample;
 			packageProductDependencies = (
+				12455B26B59F333A4FC7EEF0 /* CoreKit */,
 				397F7757A735F8AE18ECEB46 /* Reservation */,
 				DAE1FBD9B5E9303BCA5589D5 /* Trip */,
 			);
@@ -130,7 +139,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C8A7B0F3046AA4400F88288 /* ReservationExampleApp.swift in Sources */,
+				52F31883935973AFC09C0D68 /* AppFlowCoordinator.swift in Sources */,
+				2E88865B8FD445D6AD44A4A5 /* AppComponent.swift in Sources */,
+				0C8A7B0F3046AA4400F88288 /* ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -143,7 +154,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -295,7 +306,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -357,6 +368,10 @@
 		DAE1FBD9B5E9303BCA5589D5 /* Trip */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Trip;
+		};
+		12455B26B59F333A4FC7EEF0 /* CoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CoreKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

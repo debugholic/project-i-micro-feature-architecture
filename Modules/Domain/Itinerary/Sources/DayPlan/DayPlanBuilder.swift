@@ -12,20 +12,22 @@ struct DayPlanBuilder {
 
   func build(
     trip: Trip,
-    items: [ItineraryItem]
+    items: [ItineraryItem],
+    lodgings: [Lodging],
+    places: [TripPlace]
   ) -> [DayPlan] {
-    let lodgings = items.filter { $0.category == .lodging }
-    let scheduled = items.filter { $0.category != .lodging }
-    let all = trip.flightItems + scheduled.map(DayPlanItem.custom)
+    let all = trip.flightItems + items.map(DayPlanItem.custom)
     let grouped = Dictionary(grouping: all) { calendar.startOfDay(for: $0.startTime) }
+    let placesByDay = Dictionary(grouping: places) { calendar.startOfDay(for: $0.date) }
 
     return dayPlans(
       of: trip,
       grouped: grouped,
       lodgings: lodgings,
+      placesByDay: placesByDay,
       on: axis.dates(
         of: trip,
-        including: Set(grouped.keys),
+        including: Set(grouped.keys).union(placesByDay.keys),
         lodgings: lodgings
       )
     )
@@ -34,7 +36,8 @@ struct DayPlanBuilder {
   private func dayPlans(
     of trip: Trip,
     grouped: [Date: [DayPlanItem]],
-    lodgings: [ItineraryItem],
+    lodgings: [Lodging],
+    placesByDay: [Date: [TripPlace]],
     on dates: [Date]
   ) -> [DayPlan] {
     var origin: DayPlanPlace = .airport(trip.outbound.departure.airport)
@@ -55,7 +58,8 @@ struct DayPlanBuilder {
         destination: destination,
         items: items,
         lodging: lodging,
-        origin: origin
+        origin: origin,
+        places: placesByDay[date] ?? []
       )
     }
   }

@@ -12,7 +12,7 @@ struct ItinerarySummaryView: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 20) {
       CardSection(title: "숙소 정보") {
-        LodgingCard(input: input, item: plan.lodging)
+        LodgingCard(input: input, lodging: plan.lodging)
       }
 
       CardSection(title: "식사 정보") {
@@ -43,27 +43,23 @@ struct ItinerarySummaryView: View {
 
   private struct LodgingCard: View {
     let input: any ItineraryViewModelType
-    let item: ItineraryItem?
+    let lodging: Lodging?
 
     var body: some View {
       Button {
-        input.didTapLodging()
+        input.didSelectLodging()
       } label: {
         VStack(spacing: 0) {
-          RowLabel(detail: nil, title: "숙소", value: item?.title)
-          if let item {
-            RowLabel(detail: nil, title: "지역", value: item.location)
-            if let endTime = item.endTime {
-              RowLabel(
-                detail: ItineraryFormatter.dayRange(from: item.startTime, to: endTime),
-                title: "기간",
-                value: nil
-              )
-            }
-            RowLabel(detail: ItineraryFormatter.dayTime(item.startTime), title: "체크인", value: nil)
-            if let endTime = item.endTime {
-              RowLabel(detail: ItineraryFormatter.dayTime(endTime), title: "체크아웃", value: nil)
-            }
+          RowLabel(detail: nil, title: "숙소", value: lodging?.name)
+          if let lodging {
+            RowLabel(detail: nil, title: "지역", value: lodging.location)
+            RowLabel(
+              detail: ItineraryFormatter.dayRange(from: lodging.checkIn, to: lodging.checkOut),
+              title: "기간",
+              value: nil
+            )
+            RowLabel(detail: ItineraryFormatter.dayTime(lodging.checkIn), title: "체크인", value: nil)
+            RowLabel(detail: ItineraryFormatter.dayTime(lodging.checkOut), title: "체크아웃", value: nil)
           }
         }
         .contentShape(Rectangle())

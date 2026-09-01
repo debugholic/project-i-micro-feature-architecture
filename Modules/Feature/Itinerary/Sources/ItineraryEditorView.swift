@@ -1,8 +1,4 @@
 import DomainItineraryInterface
-import DomainRecommendationInterface
-import DomainReservationInterface
-import DomainTripInterface
-import SharedCommon
 import SwiftUI
 
 struct ItineraryEditorView: View {
@@ -15,23 +11,26 @@ struct ItineraryEditorView: View {
   var body: some View {
     NavigationView {
       Form {
-        if !viewModel.unscheduledSights.isEmpty {
+        if !viewModel.unscheduledPlaces.isEmpty {
           Section("담아둔 곳") {
-            SightPicker(sights: viewModel.unscheduledSights, viewModel: viewModel)
+            PlacePicker(places: viewModel.unscheduledPlaces, viewModel: viewModel)
           }
         }
 
         Section {
           TextField("이름", text: $viewModel.title)
 
-          if viewModel.showsLodgingRange {
+          switch viewModel.target {
+          case .item(let mealSlot):
+            if mealSlot == nil {
+              DatePicker("시각", selection: $viewModel.startTime, displayedComponents: .hourAndMinute)
+            }
+          case .lodging:
             TextField("지역", text: $viewModel.location)
             DatePicker("체크인", selection: $viewModel.startTime)
             DatePicker("체크아웃", selection: $viewModel.endTime)
-          }
-
-          if viewModel.showsTime {
-            DatePicker("시각", selection: $viewModel.startTime, displayedComponents: .hourAndMinute)
+          case .place:
+            EmptyView()
           }
         } footer: {
           if !viewModel.isHourAvailable {
@@ -53,7 +52,7 @@ struct ItineraryEditorView: View {
               .frame(maxWidth: .infinity)
           } footer: {
             if viewModel.canUnschedule {
-              Text("빼면 시각만 지워지고 주요 관광 정보에는 남습니다.")
+              Text("빼면 시간표에서만 사라지고 주요 관광 정보에는 남습니다.")
             }
           }
         }
@@ -73,24 +72,32 @@ struct ItineraryEditorView: View {
   }
 
   private var navigationTitle: String {
-    let name = ItineraryFormatter.categoryName(viewModel.category)
+    let name: String
+    switch viewModel.target {
+    case .item(let mealSlot):
+      name = mealSlot.map(ItineraryFormatter.mealName) ?? "장소"
+    case .lodging:
+      name = "숙소"
+    case .place:
+      name = "관광지"
+    }
     return viewModel.isEditing ? "\(name) 수정" : "\(name) 추가"
   }
 
-  private struct SightPicker: View {
-    let sights: [ItineraryItem]
+  private struct PlacePicker: View {
+    let places: [TripPlace]
     let viewModel: ItineraryEditorViewModel
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 8)]
 
     var body: some View {
       LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
-        ForEach(sights) { sight in
+        ForEach(places) { place in
           Chip(
-            isSelected: viewModel.title == sight.title,
-            title: sight.title
+            isSelected: viewModel.title == place.name,
+            title: place.name
           ) {
-            viewModel.didSelectSight(sight)
+            viewModel.didSelectPlace(place)
           }
         }
       }

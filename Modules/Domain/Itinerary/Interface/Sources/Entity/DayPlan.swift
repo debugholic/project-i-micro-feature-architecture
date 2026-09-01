@@ -1,13 +1,13 @@
 import DomainReservationInterface
-import DomainReservationInterface
 import Foundation
 
 public nonisolated struct DayPlan: Hashable, Identifiable {
   public let date: Date
   public let destination: DayPlanPlace
   public let items: [DayPlanItem]
-  public let lodging: ItineraryItem?
+  public let lodging: Lodging?
   public let origin: DayPlanPlace
+  public let places: [TripPlace]
 
   public var id: Date { date }
 
@@ -15,35 +15,37 @@ public nonisolated struct DayPlan: Hashable, Identifiable {
     date: Date,
     destination: DayPlanPlace,
     items: [DayPlanItem],
-    lodging: ItineraryItem?,
-    origin: DayPlanPlace
+    lodging: Lodging?,
+    origin: DayPlanPlace,
+    places: [TripPlace]
   ) {
     self.date = date
     self.destination = destination
     self.items = items
     self.lodging = lodging
     self.origin = origin
+    self.places = places
   }
 
   public var timelineItems: [DayPlanItem] {
     items.filter { item in
       guard let custom = item.itineraryItem else { return true }
-      return custom.category == .place
+      return custom.mealSlot == nil
     }
   }
 
-  public var sights: [ItineraryItem] {
+  public func meal(
+    _ slot: MealSlot
+  ) -> ItineraryItem? {
     items.compactMap(\.itineraryItem)
-      .filter {
-        $0.category == .place || $0.category == .sight
-      }
+      .first { $0.mealSlot == slot }
   }
 
-  public func meal(_ slot: MealSlot) -> ItineraryItem? {
+  public func item(
+    for place: TripPlace
+  ) -> ItineraryItem? {
     items.compactMap(\.itineraryItem)
-      .first {
-        $0.category == .meal(slot)
-      }
+      .first { $0.placeID == place.id }
   }
 }
 

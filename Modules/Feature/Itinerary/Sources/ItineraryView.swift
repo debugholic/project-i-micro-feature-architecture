@@ -30,7 +30,7 @@ struct ItineraryView: View {
           VStack(alignment: .leading, spacing: 24) {
             if let plan = viewModel.selectedPlan {
               ItineraryTimelineView(input: viewModel, plan: plan)
-              ItinerarySightsView(input: viewModel, sights: plan.sights)
+              ItinerarySightsView(input: viewModel, plan: plan)
               ItinerarySummaryView(input: viewModel, plan: plan)
             }
           }

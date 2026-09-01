@@ -10,10 +10,10 @@ public struct DeleteTripUseCaseImpl: DeleteTripUseCase {
   }
 
   public func execute(
-    request: Trip
+    request trip: Trip
   ) {
     tripRepository.remove(
-      request
+      trip
     )
   }
 }

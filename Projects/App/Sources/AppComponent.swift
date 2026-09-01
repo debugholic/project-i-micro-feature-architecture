@@ -21,7 +21,6 @@ import Foundation
 import SharedCommon
 import UIKit
 
-/// 모듈을 조립한다. 화면 전환은 `AppFlowCoordinator` 가 맡는다.
 @MainActor
 final class AppComponent {
   // MARK: - Storage
@@ -29,6 +28,18 @@ final class AppComponent {
   private lazy var itineraryStorage: any Storage<ItineraryItem> = {
     UserDefaultsStorageImpl(
       key: "itineraryItems"
+    )
+  }()
+
+  private lazy var lodgingStorage: any Storage<Lodging> = {
+    UserDefaultsStorageImpl(
+      key: "lodgings"
+    )
+  }()
+
+  private lazy var tripPlaceStorage: any Storage<TripPlace> = {
+    UserDefaultsStorageImpl(
+      key: "tripPlaces"
     )
   }()
 
@@ -69,6 +80,18 @@ final class AppComponent {
     )
   }()
 
+  private lazy var lodgingRepository: LodgingRepository = {
+    LodgingRepositoryImpl(
+      storage: lodgingStorage
+    )
+  }()
+
+  private lazy var tripPlaceRepository: TripPlaceRepository = {
+    TripPlaceRepositoryImpl(
+      storage: tripPlaceStorage
+    )
+  }()
+
   private lazy var placeRecommendationRepository: PlaceRecommendationRepository = {
     TravelGuidePlaceRepositoryImpl()
   }()
@@ -90,9 +113,13 @@ final class AppComponent {
   private lazy var itineraryComponent: any ItineraryComponent = {
     ItineraryComponentImpl(
       deleteItineraryItemUseCase: makeDeleteItineraryItemUseCase(),
+      deleteLodgingUseCase: makeDeleteLodgingUseCase(),
+      deleteTripPlaceUseCase: makeDeleteTripPlaceUseCase(),
       observeDayPlansUseCase: makeObserveDayPlansUseCase(),
       recommendAreasUseCase: makeRecommendAreasUseCase(),
-      saveItineraryItemUseCase: makeSaveItineraryItemUseCase()
+      saveItineraryItemUseCase: makeSaveItineraryItemUseCase(),
+      saveLodgingUseCase: makeSaveLodgingUseCase(),
+      saveTripPlaceUseCase: makeSaveTripPlaceUseCase()
     )
   }()
 
@@ -130,10 +157,36 @@ final class AppComponent {
     )
   }
 
+  private func makeDeleteLodgingUseCase() -> any DeleteLodgingUseCase {
+    DeleteLodgingUseCaseImpl(
+      lodgingRepository: lodgingRepository
+    )
+  }
+
+  private func makeDeleteTripPlaceUseCase() -> any DeleteTripPlaceUseCase {
+    DeleteTripPlaceUseCaseImpl(
+      tripPlaceRepository: tripPlaceRepository
+    )
+  }
+
   private func makeObserveDayPlansUseCase() -> any ObserveDayPlansUseCase {
     ObserveDayPlansUseCaseImpl(
       items: itineraryStorage.elementsPublisher,
+      lodgings: lodgingStorage.elementsPublisher,
+      places: tripPlaceStorage.elementsPublisher,
       trips: tripStorage.elementsPublisher
+    )
+  }
+
+  private func makeSaveLodgingUseCase() -> any SaveLodgingUseCase {
+    SaveLodgingUseCaseImpl(
+      lodgingRepository: lodgingRepository
+    )
+  }
+
+  private func makeSaveTripPlaceUseCase() -> any SaveTripPlaceUseCase {
+    SaveTripPlaceUseCaseImpl(
+      tripPlaceRepository: tripPlaceRepository
     )
   }
 

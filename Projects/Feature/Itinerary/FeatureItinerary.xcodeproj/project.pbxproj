@@ -7,15 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C8A7B243046AA8100F88288 /* ItineraryExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A7B213046AA8100F88288 /* ItineraryExampleApp.swift */; };
+		0C8A7B243046AA8100F88288 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A7B213046AA8100F88288 /* ExampleApp.swift */; };
 		3C9E75C2F3BAD0A2C0A0B41E /* Recommendation in Frameworks */ = {isa = PBXBuildFile; productRef = CDEFB708035205DB5AE7F9EF /* Recommendation */; };
 		5B608C85889E98A66036B827 /* Trip in Frameworks */ = {isa = PBXBuildFile; productRef = BED57E4E5A4C56A62C84AB3D /* Trip */; };
 		A5B0CEEB8307AE96F5FB5A56 /* Itinerary in Frameworks */ = {isa = PBXBuildFile; productRef = 410F64796FD044559FD1ACA5 /* Itinerary */; };
+		3859538671B68371511AABF2 /* CoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1BAE12B9B0B917D37259F383 /* CoreKit */; };
+		387453E42225F3503D413BED /* AppComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57CE8C43432471E0BDF870DF /* AppComponent.swift */; };
+		8C058DA56AE56EF5B993E7BA /* AppFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB04FF9140AF70C19134582 /* AppFlowCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0C8A7B213046AA8100F88288 /* ItineraryExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItineraryExampleApp.swift; sourceTree = "<group>"; };
+		0C8A7B213046AA8100F88288 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
 		0C8A7B693046B45C00F88288 /* ItineraryExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ItineraryExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		57CE8C43432471E0BDF870DF /* AppComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppComponent.swift; sourceTree = "<group>"; };
+		3FB04FF9140AF70C19134582 /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -23,6 +28,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3859538671B68371511AABF2 /* CoreKit in Frameworks */,
 				A5B0CEEB8307AE96F5FB5A56 /* Itinerary in Frameworks */,
 				3C9E75C2F3BAD0A2C0A0B41E /* Recommendation in Frameworks */,
 				5B608C85889E98A66036B827 /* Trip in Frameworks */,
@@ -35,7 +41,9 @@
 		0C8A7B223046AA8100F88288 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				0C8A7B213046AA8100F88288 /* ItineraryExampleApp.swift */,
+				3FB04FF9140AF70C19134582 /* AppFlowCoordinator.swift */,
+				57CE8C43432471E0BDF870DF /* AppComponent.swift */,
+				0C8A7B213046AA8100F88288 /* ExampleApp.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -73,6 +81,7 @@
 			);
 			name = ItineraryExample;
 			packageProductDependencies = (
+				1BAE12B9B0B917D37259F383 /* CoreKit */,
 				410F64796FD044559FD1ACA5 /* Itinerary */,
 				CDEFB708035205DB5AE7F9EF /* Recommendation */,
 				BED57E4E5A4C56A62C84AB3D /* Trip */,
@@ -133,7 +142,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C8A7B243046AA8100F88288 /* ItineraryExampleApp.swift in Sources */,
+				8C058DA56AE56EF5B993E7BA /* AppFlowCoordinator.swift in Sources */,
+				387453E42225F3503D413BED /* AppComponent.swift in Sources */,
+				0C8A7B243046AA8100F88288 /* ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,7 +155,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				DEVELOPMENT_TEAM = 9G2WQZ5G69;
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				PRODUCT_NAME = ItineraryExample;
@@ -221,7 +232,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 9G2WQZ5G69;
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -244,6 +255,36 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
+		};
+		7778C8D8CD720A9F276A0296 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.debugholic.ProjectI.example.itinerary;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
 		};
 		94E2CA348C86C1D2B0C6885E /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -303,36 +344,6 @@
 			};
 			name = Release;
 		};
-		7778C8D8CD720A9F276A0296 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 9G2WQZ5G69;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.debugholic.ProjectI.example.itinerary;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -376,6 +387,10 @@
 		CDEFB708035205DB5AE7F9EF /* Recommendation */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Recommendation;
+		};
+		1BAE12B9B0B917D37259F383 /* CoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CoreKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

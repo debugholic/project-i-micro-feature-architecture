@@ -168,8 +168,6 @@ enum Component {
     return FileManager.default.fileExists(atPath: fullPath)
   }
 
-  /// Xcode 16 은 SwiftUI 를 import 한 모듈에 SwiftUICore 오토링크를 박는다.
-  /// SwiftUICore 는 iOS 18 부터 존재해서 그 아래 기기에서 dyld 로드가 실패한다.
   var swiftSettings: [PackageDescription.SwiftSetting] {
     [
       .unsafeFlags([
@@ -223,7 +221,6 @@ enum Product: String, CaseIterable {
     }
   }
 
-  /// 테스트 타깃은 라이브러리로 내보내지 않는다.
   var targets: [Component] {
     components.filter { !$0.isTest }
   }
@@ -236,6 +233,7 @@ enum Product: String, CaseIterable {
         .domainInterface(
           self,
           dependencies: [
+            .domainInterface(.recommendation),
             .domainInterface(.trip),
             .shared(.common),
           ]
@@ -252,6 +250,7 @@ enum Product: String, CaseIterable {
           self,
           dependencies: [
             .domainInterface(self),
+            .domainInterface(.recommendation),
             .domainInterface(.reservation),
             .domainTesting(.reservation),
             .sharedTesting(.common),

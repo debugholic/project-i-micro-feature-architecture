@@ -7,13 +7,18 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0C8A7B283046AA8E00F88288 /* TripExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A7B253046AA8E00F88288 /* TripExampleApp.swift */; };
+		0C8A7B283046AA8E00F88288 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C8A7B253046AA8E00F88288 /* ExampleApp.swift */; };
 		1146F4968EEAF191180B8DC2 /* Trip in Frameworks */ = {isa = PBXBuildFile; productRef = C0AB29B1641F03F7C4FBCC35 /* Trip */; };
+		E3BCCA02C3A3E835087FBD40 /* CoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = D8C89B36E703543282DF735D /* CoreKit */; };
+		C87B1F84DAB1C31BA0AB606D /* AppComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBD5A40EDC0347F067B0685 /* AppComponent.swift */; };
+		CEFB30BEE2FA0270436237B4 /* AppFlowCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBE4C403B3A5414BC479ED8A /* AppFlowCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		0C8A7B253046AA8E00F88288 /* TripExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TripExampleApp.swift; sourceTree = "<group>"; };
+		0C8A7B253046AA8E00F88288 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
 		0C8A7B6B3046B46D00F88288 /* TripExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TripExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CBD5A40EDC0347F067B0685 /* AppComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppComponent.swift; sourceTree = "<group>"; };
+		BBE4C403B3A5414BC479ED8A /* AppFlowCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFlowCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -21,6 +26,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3BCCA02C3A3E835087FBD40 /* CoreKit in Frameworks */,
 				1146F4968EEAF191180B8DC2 /* Trip in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -31,7 +37,9 @@
 		0C8A7B263046AA8E00F88288 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				0C8A7B253046AA8E00F88288 /* TripExampleApp.swift */,
+				BBE4C403B3A5414BC479ED8A /* AppFlowCoordinator.swift */,
+				4CBD5A40EDC0347F067B0685 /* AppComponent.swift */,
+				0C8A7B253046AA8E00F88288 /* ExampleApp.swift */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -69,6 +77,7 @@
 			);
 			name = TripExample;
 			packageProductDependencies = (
+				D8C89B36E703543282DF735D /* CoreKit */,
 				C0AB29B1641F03F7C4FBCC35 /* Trip */,
 			);
 			productName = TripExample;
@@ -127,7 +136,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C8A7B283046AA8E00F88288 /* TripExampleApp.swift in Sources */,
+				CEFB30BEE2FA0270436237B4 /* AppFlowCoordinator.swift in Sources */,
+				C87B1F84DAB1C31BA0AB606D /* AppComponent.swift in Sources */,
+				0C8A7B283046AA8E00F88288 /* ExampleApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,7 +215,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -292,7 +303,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 82P75Q2F2K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -350,6 +361,10 @@
 		C0AB29B1641F03F7C4FBCC35 /* Trip */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Trip;
+		};
+		D8C89B36E703543282DF735D /* CoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CoreKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

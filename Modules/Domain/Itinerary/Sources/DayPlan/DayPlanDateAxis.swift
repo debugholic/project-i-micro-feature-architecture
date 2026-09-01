@@ -8,14 +8,14 @@ struct DayPlanDateAxis {
   func dates(
     of trip: Trip,
     including extra: Set<Date>,
-    lodgings: [ItineraryItem]
+    lodgings: [Lodging]
   ) -> [Date] {
     let start = calendar.startOfDay(for: trip.startDate)
     let end = calendar.startOfDay(for: trip.endDate)
 
     var result: Set<Date> = extra
     for lodging in lodgings {
-      result.insert(calendar.startOfDay(for: lodging.startTime))
+      result.insert(calendar.startOfDay(for: lodging.checkIn))
     }
 
     var cursor = start

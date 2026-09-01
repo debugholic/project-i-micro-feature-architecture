@@ -7,7 +7,7 @@ import SwiftUI
 
 struct ItinerarySightsView: View {
   let input: any ItineraryViewModelType
-  let sights: [ItineraryItem]
+  let plan: DayPlan
 
   private let columns = [GridItem(.flexible(), spacing: 8), GridItem(.flexible(), spacing: 8)]
 
@@ -18,8 +18,12 @@ struct ItinerarySightsView: View {
         .foregroundColor(.secondary)
 
       LazyVGrid(columns: columns, alignment: .leading, spacing: 8) {
-        ForEach(sights) { sight in
-          SightChip(input: input, sight: sight)
+        ForEach(plan.places) { place in
+          PlaceChip(
+            input: input,
+            place: place,
+            scheduled: plan.item(for: place)
+          )
         }
         AddChip(
           symbol: "square.and.pencil",
@@ -37,23 +41,24 @@ struct ItinerarySightsView: View {
     }
   }
 
-  private struct SightChip: View {
+  private struct PlaceChip: View {
     let input: any ItineraryViewModelType
-    let sight: ItineraryItem
+    let place: TripPlace
+    let scheduled: ItineraryItem?
 
-    private var isScheduled: Bool { sight.category == .place }
+    private var isScheduled: Bool { scheduled != nil }
 
     var body: some View {
       Button {
-        input.didSelectItem(sight)
+        input.didSelectPlace(place)
       } label: {
         HStack(spacing: 6) {
           if isScheduled {
-            Text(ItineraryFormatter.time(sight.startTime))
+            Text(ItineraryFormatter.time(scheduled?.startTime ?? place.date))
               .font(.caption.monospacedDigit().weight(.semibold))
               .foregroundColor(.green)
           }
-          Text(sight.title)
+          Text(place.name)
             .font(.footnote.weight(isScheduled ? .semibold : .regular))
             .foregroundColor(.primary)
             .lineLimit(1)

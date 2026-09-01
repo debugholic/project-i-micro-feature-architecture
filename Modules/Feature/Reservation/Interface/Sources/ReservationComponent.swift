@@ -11,7 +11,6 @@ public struct AddReservationViewModelActions: ViewModelActions {
   }
 }
 
-/// 항공편 조회 화면을 조립해 내놓는다.
 @MainActor
 public protocol ReservationComponent {
   func makeAddReservationViewController(

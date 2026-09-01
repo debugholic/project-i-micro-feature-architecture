@@ -1,7 +1,6 @@
 import Combine
 import Foundation
 
-/// `UserDefaults` 에 JSON 으로 영속화하는 저장소. 앱을 껐다 켜도 값이 남는다.
 public final class UserDefaultsStorageImpl<Element: Codable & Identifiable>: Storage {
   private let defaults: UserDefaults
   private let encoder = JSONEncoder()
@@ -27,7 +26,6 @@ public final class UserDefaultsStorageImpl<Element: Codable & Identifiable>: Sto
     )
   }
 
-  /// 같은 `id` 가 있으면 교체하고 없으면 덧붙인다.
   public func save(
     _ element: Element
   ) {

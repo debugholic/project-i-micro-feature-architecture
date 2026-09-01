@@ -2,7 +2,6 @@ import DomainReservationInterface
 import DomainReservationInterface
 import Foundation
 
-/// 편명별로 성공/실패를 미리 지정하고 호출 이력을 기록한다.
 public final class MockReservationRepository: ReservationRepository {
   public enum Stub {
     case success(FlightLeg)
