@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Modules">
+   </FileRef>
+   <Group
+      location = "group:Projects"
+      name = "Projects">
+      <FileRef
+         location = "group:App/App.xcodeproj">
+      </FileRef>
+      <Group
+         location = "group:Feature"
+         name = "Feature">
+         <FileRef
+            location = "group:Itinerary/FeatureItinerary.xcodeproj">
+         </FileRef>
+         <FileRef
+            location = "group:Reservation/FeatureReservation.xcodeproj">
+         </FileRef>
+         <FileRef
+            location = "group:Trip/FeatureTrip.xcodeproj">
+         </FileRef>
+      </Group>
+   </Group>
+</Workspace>
