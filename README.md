@@ -1,135 +1,172 @@
-# Project H — SPM 모듈화
+# Project I — Micro Feature Architecture
 
-[Project A-Z](#project-a-z) 의 H 단계.
+[Project A-Z](#project-a-z) 의 I 단계.
 
 단계마다 새로운 기술 스택을 하나씩 더해가며, 조금씩 다른 기능을 구현해 나갑니다.
-H 단계는 **Swift Package Manager**를 추가합니다 — **앱을 통째로 쪼개는 게 아니라**, 추천 여행지 카탈로그 하나를 `TravelGuide` 로컬 패키지로 떼어 내고 앱에 결합합니다. 앱의 `Domain`/`Data`/`Presentation`은 폴더 그대로 두고, 그 위에 **주요 관광 정보** 기능을 얹었습니다.
+I 단계는 **Micro Feature Architecture**를 추가합니다 — H에서 카탈로그 하나만 로컬 패키지로 떼어냈다면, 여기서는 **앱을 통째로 모듈로 쪼갭니다.** 앱 타깃에 남은 Swift 파일은 4개입니다.
 
 ## 다루는 기술
 
-- UIKit (Programmatic, Storyboard 없음) · MVVM · Diffable Data Source
-- Combine (상태 바인딩)
-- async/await (`URLSession`/`Codable` 실제 API 호출)
+- UIKit (Programmatic) · SwiftUI · MVVM · Diffable Data Source
+- Combine (상태 바인딩) · async/await
 - Clean Architecture (계층 분리 · 의존성 역전 · Use Case · DI 컨테이너)
 - XCTest
-- SwiftUI (`UIHostingController` 상호운용)
-- **Swift Package Manager** (로컬 패키지 · 리소스 번들 · `Bundle.module`) ← 이번 단계 추가분
+- Swift Package Manager (로컬 패키지 · 리소스 번들 · `Bundle.module`)
+- **Micro Feature Architecture** (모듈 5종 세트 · Interface 의존 · Example 앱) ← 이번 단계 추가분
 
-## 새 기능 — 주요 관광 정보
+## 무엇이 달라졌나
 
-G에서 만든 일정표는 **시각이 정해진 것만** 담을 수 있었습니다. 실제로 여행을 짤 때는 "여기 가고 싶다"를 먼저 모으고 시간은 나중에 정합니다. 그래서 그날 갈 곳을 모아두는 칸을 만들었습니다.
+H의 앱은 `Domain` · `Data` · `Presentation` 폴더 안에 104개 파일이 있었습니다. 폴더는 계층을 말할 뿐이라, 어느 파일이 무엇을 봐도 컴파일러가 막지 않았습니다.
+
+I에서는 그 경계를 **모듈**로 만듭니다.
 
 ```
-주요 관광 정보
-  13:30 오도리 공원      삿포로 TV타워
-  다누키코지 상점가       + 추천에서 담기
+Modules/Package.swift          36개 타깃을 선언
+Modules/
+├── Core/      Network · Storage · TravelGuide
+├── Shared/    Common · DesignSystem
+├── Domain/    Trip · Itinerary · Reservation · Recommendation
+├── Data/      Trip · Itinerary · Reservation · Recommendation
+└── Feature/   Trip · Itinerary · Reservation
 ```
 
-**추천에서 담기**를 누르면 그날 도시의 추천 목록이 뜹니다. 도시 전체가 아니라 **구역별로 나뉘어** 있습니다 — 서울에서 경복궁·성수·홍대를 하루에 도는 건 무리니까요. 구역은 그날에 고정되지 않아서, 낮에는 성수 섹션에서 담고 저녁에는 남산 섹션에서 담아도 됩니다.
+`FeatureTrip` 이 `DomainTripInterface` 만 보고 `DataTrip` 은 못 보는 게, 이제 규칙이 아니라 **빌드 에러**입니다.
 
-### 시각은 나중에 정한다
+## 모듈 하나는 다섯 조각이다
 
-같은 항목이 시각을 갖느냐 아니냐로만 갈립니다.
+```
+Modules/Feature/Trip/
+├── Interface/Sources     FeatureTripInterface    화면 생성 계약
+├── Sources               FeatureTrip             구현
+├── Testing/Sources       FeatureTripTesting      다른 모듈에 줄 스텁
+└── Tests/Sources         FeatureTripTests
 
-| | 시각 | 시간표 | 주요 관광 정보 |
-|---|---|---|---|
-| `.sight` | 없음 | ✗ | ✓ |
-| `.place` | 있음 | ✓ | ✓ |
+Projects/Feature/Trip/
+├── FeatureTrip.xcodeproj                         Example 앱 타깃
+└── Example/Sources                               단독 실행
+```
 
-**표에는 둘 다 나옵니다.** 시간표에 장소를 넣으면 관광 정보에도 자동으로 나타나는데, 복사해 넣는 게 아니라 **같은 항목을 두 군데서 보여주는 것**이라 동기화할 게 없습니다.
+`Interface` 가 갈라져 있어서 모듈끼리 구현을 안 보고 붙습니다.
 
-빈 시간대를 눌러 장소를 넣을 때는 **담아둔 곳이 칩으로 뜹니다.** 하나 고르면 그 항목이 같은 `id`로 시각을 얻어 시간표에 올라갑니다 — 새 항목이 생기지 않습니다. 다만 칩을 고른 뒤 **이름을 고치면 새 항목**이 됩니다. 저장 시점에 이름이 그대로일 때만 그 칩에 묶으므로, 원래 칩을 덮어쓰지 않습니다.
+```
+FeatureTrip ──▶ FeatureItineraryInterface ◀── FeatureItinerary
+                          ▲
+                          └── FeatureItineraryTesting (스텁)
+```
 
-반대 방향도 필요합니다. 시간표와 관광 정보가 같은 항목이라 삭제하면 양쪽에서 사라지므로, 시각만 빼는 **`시간표에서 빼기`** 를 따로 뒀습니다. 에디터의 `시간 정하기` 스위치가 같은 일을 하지만 삭제 버튼 옆에서는 보이지 않아서요.
+**Example은 SPM으로 만들 수 없습니다.** `.testTarget` 은 SPM의 정식 타깃이지만 iOS 앱 product 타입은 없습니다. 그래서 다섯 조각 중 Example만 `Projects/` 의 Xcode 프로젝트가 맡습니다 — 모듈마다 프로젝트 하나, 타깃 하나입니다. **이 수동 작업이 다음 단계에서 Tuist를 넣는 이유**가 됩니다.
+
+## 조립과 전환을 가른다
 
 ```swift
-var category: ItineraryCategory {
-  guard showsTimeToggle else { return baseCategory }
-  return hasTime ? .place : .sight
+AppComponent          // 조립 — Storage · Repository · UseCase · 모듈 Component
+AppFlowCoordinator    // 전환 — push · pop
+```
+
+각 모듈은 `TripComponent` 같은 프로토콜로 화면을 내놓고, 앱은 그것만 압니다. Example도 같은 구조를 그대로 씁니다 — `Projects/Feature/<M>/Example/Sources` 에 `AppComponent` 와 `AppFlowCoordinator` 가 같은 이름으로 있습니다. 저장소만 메모리일 뿐, 나머지는 앱과 같은 실제 구현입니다.
+
+## 읽기와 쓰기를 가른다
+
+```
+읽기   Storage.elementsPublisher → Component 가 ViewModel 에 직접 꽂음
+쓰기   ViewModel → UseCase → Repository → Storage
+```
+
+읽기 경로에서 `ObserveTripsUseCase` 는 `tripRepository.tripsPublisher` 를 그대로 흘려보내기만 했습니다. 통과 계층을 지우고, 규칙이 있는 `ObserveDayPlansUseCase` 만 남겼습니다. 그것도 조립은 `DayPlanBuilder` 로 빼서 UseCase에는 구독과 변환만 둡니다.
+
+저장은 `UserDefaultsStorageImpl` 로 바뀌어 앱을 껐다 켜도 남습니다.
+
+```swift
+public protocol Storage<Element> {
+  var elementsPublisher: AnyPublisher<[Element], Never> { get }
+  func save(_ element: Element)
+  func delete(_ element: Element)
 }
 ```
 
-## `TravelGuide` — SPM이라서 하는 일
+`InMemoryStorageImpl` 과 `UserDefaultsStorageImpl` 이 같은 계약을 채우고, 앱은 어느 쪽인지 모릅니다. K 단계의 Core Data가 들어올 자리입니다.
 
-추천 목록은 앱이 아니라 **로컬 패키지**에 있습니다.
+## 도메인을 다시 나눴다
 
-```
-Modules/TravelGuide/
-├── Package.swift
-├── Sources/TravelGuide/
-│   ├── PlaceCatalog.swift          도시 → 구역 → 장소
-│   ├── RecommendedPlace.swift
-│   └── Resources/places.json       5개 도시 · 18개 구역
-└── Tests/TravelGuideTests/         7개
-```
-
-핵심은 **`resources:` 와 `Bundle.module`** 입니다. 앱 타깃에 JSON을 넣을 때와 접근 경로가 다릅니다 — `Bundle.main`으로 찾으면 못 찾습니다.
+H의 `ItineraryCategory` 하나에 성격이 다른 세 축이 들어 있었습니다.
 
 ```swift
-.target(name: "TravelGuide", resources: [.process("Resources")])
-```
-```swift
-guard let url = Bundle.module.url(forResource: "places", withExtension: "json") else { ... }
-```
-
-**시뮬레이터 없이 테스트가 돕니다.** 패키지가 iOS·macOS 양쪽을 지원하고 UI 의존이 없어서, `swift test` 한 줄로 7개가 0.006초에 끝납니다. 앱을 띄우지 않아도 카탈로그가 검증됩니다.
-
-### 모듈명과 타입명을 다르게 둔 이유
-
-패키지 이름은 `TravelGuide`인데 안의 타입은 `PlaceCatalog`입니다. 둘 다 `TravelGuide`면 다른 모듈에서 `TravelGuide.PlaceCategory`라고 쓸 때 **모듈 한정인지 중첩 타입인지 모호해집니다.** SwiftUI의 `Section`·`Label`을 중첩 타입으로 가렸던 것과 같은 종류의 문제입니다.
-
-## 패키지는 앱이 아는 대상이 아니다
-
-앱은 `TravelGuide`를 모릅니다. Domain이 프로토콜을 갖고, Data만 패키지를 압니다.
-
-```
-Domain      PlaceRecommendationRepository        ← 앱이 아는 건 이것뿐
-Data        TravelGuidePlaceRepositoryImpl       ← 여기서만 import TravelGuide
+enum ItineraryCategory {
+  case lodging      // 범위를 갖는 다른 개념
+  case meal(MealSlot)  // 화면의 식사 칸을 가리키는 태그
+  case place        // 시각 있음
+  case sight        // 시각 없음
+}
 ```
 
-`RecommendedPlace`도 Domain과 패키지에 각각 있고 Data가 옮겨 담습니다. 중복처럼 보이지만 **그게 값입니다** — 나중에 CloudKit이나 원격 API로 바꿔도 Domain 위쪽은 손대지 않습니다. Repository를 처음부터 `async throws`로 둔 것도 같은 이유입니다. JSON 읽기는 즉시 끝나지만, 네트워크 구현이 들어올 때 시그니처가 바뀌면 UseCase·ViewModel까지 줄줄이 따라옵니다.
+상태를 바꾸려면 종류를 바꿔야 했고, 그게 `시간 정하기` 스위치로 화면에 새어 나왔습니다. 시각 없는 곳을 담으려고 **시간대를 눌러 들어가서 시각을 다시 빼는** 순서였고요.
 
-번들 JSON은 그때도 안 버립니다. 여행 앱은 데이터 로밍 안 되는 곳에서 켜지니 오프라인 폴백으로 남습니다.
+타입을 나눴습니다.
 
-## G 단계와 달라진 점
-
-| | G (SwiftUI) | H (+ SPM) |
+| 타입 | 갖는 것 | 나오는 곳 |
 |---|---|---|
-| 로컬 패키지 | — | **`Modules/TravelGuide`** |
-| 새 기능 | — | **주요 관광 정보** (담아두기 → 시각 부여) |
-| 새 도메인 | — | `RecommendedArea` · `RecommendedPlace` · `PlaceRecommendationRepository` · `RecommendAreasUseCase` |
-| 일정 종류 | 장소·식사·숙소 | **+ 관광지**(시각 없는 장소) |
-| 테스트 | 51 | **61 + 7**(패키지) |
+| `TripPlace` | 이름 · 날짜 · 추천 분류 | 주요 관광 정보 |
+| `ItineraryItem` | 시각 · `mealSlot?` · `placeID?` | 시간표 |
+| `Lodging` | 체크인 · 체크아웃 · 지역 | 숙소 칸 |
+
+토글이 사라지고 `직접 추가` 가 생겼습니다. 추천에서 담을 때 버려지던 음식점·쇼핑·명소 분류도 `TripPlace` 가 보관합니다.
+
+## H 단계와 달라진 점
+
+| | H (SPM) | I (+ MFA) |
+|---|---|---|
+| 앱 타깃의 Swift 파일 | 104 | **4** |
+| 모듈 | `TravelGuide` 1개 | **36개 타깃 · 6개 product** |
+| 모듈 경계 | 폴더 | **컴파일러** |
+| Example 앱 | — | **모듈마다 1개** |
+| 저장 | 메모리 | **UserDefaults** |
+| 테스트 | 61 + 7 | **69** (6개 타깃) |
+
+## 구조
+
+```
+ProjectI.xcworkspace
+Modules/            Package.swift + 36 타깃
+Projects/
+├── App/            App.xcodeproj · Sources (4 파일)
+└── Feature/
+    ├── Trip/       FeatureTrip.xcodeproj · Example/Sources
+    ├── Itinerary/  FeatureItinerary.xcodeproj · Example/Sources
+    └── Reservation/ FeatureReservation.xcodeproj · Example/Sources
+```
 
 ## 테스트
 
-| 대상 | 실행 | 개수 |
+`swift test` 는 쓸 수 없습니다. 패키지에 UIKit 타깃이 있어서 macOS 빌드가 거기서 깨집니다. 스킴이 시뮬레이터에서 실행합니다.
+
+| 스킴 | 도는 테스트 | 개수 |
 |---|---|---|
-| **`TravelGuideTests`** | **`swift test`** (시뮬레이터 불필요) | **7** |
-| `ObserveDayPlansUseCaseTests` | xcodebuild (시뮬레이터) | 10 |
-| `ItineraryViewModelTests` | xcodebuild | 16 |
-| `ItineraryEditorViewModelTests` | xcodebuild | 18 |
-| 그 외 Domain·Presentation | xcodebuild | 17 |
+| `App` | `CoreTravelGuideTests` | 7 |
+| `FeatureTripExample` | `DomainTripTests` · `FeatureTripTests` | 10 |
+| `FeatureReservationExample` | `FeatureReservationTests` | 3 |
+| `FeatureItineraryExample` | `DomainItineraryTests` · `FeatureItineraryTests` | 49 |
+
+```
+xcodebuild test -workspace ProjectI.xcworkspace -scheme FeatureItineraryExample -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+```
 
 ## API 키 설정
 
-AeroDataBox(RapidAPI) 키는 F부터 동일하게 `Secrets.local.xcconfig`로 주입합니다.
+AeroDataBox(RapidAPI) 키는 F부터 동일하게 주입합니다. `Projects/App/Secrets.local.xcconfig` 에 둡니다 — `Config.xcconfig` 옆이어야 `#include?` 가 찾습니다.
 
 ```
 RAPIDAPI_KEY = your_rapidapi_key
 ```
 
-## 빌드 · 테스트
+## 빌드 · 실행
 
 Xcode 16+ / iOS 16.0+ / Swift 5.9+.
 
 ```
-cd Modules/TravelGuide && swift test
+open ProjectI.xcworkspace
 ```
 
-```
-xcodebuild test -project ProjectH.xcodeproj -scheme ProjectH -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
-```
+`App` 은 전체 앱, `Feature*Example` 은 그 모듈만 링크한 단독 앱입니다.
 
 ## Project A-Z
 
@@ -144,8 +181,8 @@ xcodebuild test -project ProjectH.xcodeproj -scheme ProjectH -destination 'platf
 | E | Clean Architecture |
 | F | XCTest |
 | G | SwiftUI |
-| **H** | **SPM 모듈화** |
-| I | Micro Feature Architecture |
+| H | SPM 모듈화 |
+| **I** | **Micro Feature Architecture** |
 | J | Tuist |
 | K | Core Data |
 | L | CloudKit |
