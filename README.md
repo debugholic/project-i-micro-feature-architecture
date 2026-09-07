@@ -113,7 +113,7 @@ enum ItineraryCategory {
 
 ## H 단계와 달라진 점
 
-| | H (SPM) | I (+ MFA) |
+| | H (SPM) | I (+ Micro Feature Architecture) |
 |---|---|---|
 | 앱 타깃의 Swift 파일 | 104 | **4** |
 | 모듈 | `TravelGuide` 1개 | **36개 타깃 · 6개 product** |
